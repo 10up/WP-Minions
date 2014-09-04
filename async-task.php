@@ -105,13 +105,13 @@ class WP_Async_Task {
 	}
 
 	public function do_job( $job ) {
-		$job_data = json_decode( $job->workload() );
+		$job_data = json_decode( $job->workload(), true );
 
-		if ( function_exists( 'is_multisite' ) && is_multisite() && $job_data->blog_id ) {
-			switch_to_blog( $job_data->blog_id );
+		if ( function_exists( 'is_multisite' ) && is_multisite() && $job_data['blog_id'] ) {
+			switch_to_blog( $job_data['blog_id'] );
 		}
 
-		do_action( $job_data->hook, $job_data->args );
+		do_action( $job_data['hook'], $job_data['args'] );
 
 		return true;
 	}
