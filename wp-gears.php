@@ -1,13 +1,17 @@
 <?php
 /**
- * WP_Async_Task dropin for gearman
+ * Plugin Name: WP Gears
+ * Description: Provides methods for scheduling async tasks using Gearman
+ * Version: 0.1
+ * Author: Chris Marslender
+ */
+
+/*
+ * $gearman_servers = array(
+ *     '127.0.0.1:4730',
+ * );
  *
- * todo need global $gearman_servers array - AND a default fallback
- *      $gearman_servers = array(
- *            '127.0.0.1:4730',
- *      );
- *
- *
+ * todo should probably have a default fallback if gearman is not available for whatever reason
  */
 
 /*
@@ -21,7 +25,7 @@ if ( ! defined( 'WP_ASYNC_TASK_SALT' ) ) {
 /**
  * Adds a single async task to gearman
  *
- * @since todo
+ * @since 0.1
  */
 function wp_async_task_add( $hook, $args ) {
 	global $wp_async_task;
@@ -69,6 +73,7 @@ class WP_Async_Task {
 	}
 
 	//todo may need a CPT to track jobs in the database - For now just storing in Gearman - Will be problematic if gearmand restarts!
+	// ^^ Actually, should probably just hook gearmand up to redis, to track jobs there (Pretty sure this is possible)
 
 	public function add( $hook, $args ) {
 		$jobdata = array();
