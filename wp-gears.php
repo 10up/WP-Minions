@@ -22,6 +22,8 @@ if ( ! defined( 'WP_ASYNC_TASK_SALT' ) ) {
 	define( 'WP_ASYNC_TASK_SALT', '' );
 }
 
+// todo fixme NEED TO MAKE SURE WP_GEARS is true, or else fall back to NOT using gearman for these
+
 /**
  * Adds a single async task to gearman
  *
