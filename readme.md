@@ -36,3 +36,9 @@ $gearman_servers = array(
 = Gearman Backend - CentOS =
 
 // todo need to put the instructions here, yo.
+// These instructions are not quite complete. Plan on finishing them on Monday!
+
+1. yum install gearmand php-pecl-gearman python-pip supervisor
+
+1. Need to copy supervisor conf to /etc/init.d/supervisord
+
