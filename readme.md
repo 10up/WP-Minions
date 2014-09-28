@@ -37,8 +37,16 @@ $gearman_servers = array(
 
 // todo need to put the instructions here, yo.
 // These instructions are not quite complete. Plan on finishing them on Monday!
+// todo probably don't need gearman* on ubuntu - revisit and figure out which are actually needed. Does gearman* install the pecl part already??
 
 1. yum install gearmand php-pecl-gearman python-pip supervisor
 
 1. Need to copy supervisor conf to /etc/init.d/supervisord
 
+= Ubuntu =
+
+1. apt-get install gearman* python-pip
+
+1. pip install supervisor --pre
+
+1. pecl install gearman
