@@ -21,8 +21,12 @@ if ( ! empty( $_POST ) || defined( 'DOING_AJAX' ) || defined( 'DOING_ASYNC' ) ) 
 define('DOING_ASYNC', true);
 
 if ( ! defined( 'ABSPATH' ) ) {
-	/** Set up WordPress environment */
-	require_once( dirname( __FILE__ ) . '/wp-load.php' );
+	/** Set up WordPress environment - using SCRIPT_FILENAME so that this file works even if its a symlink! */
+	if ( ! file_exists( dirname( $_SERVER["SCRIPT_FILENAME"] ) . '/wp-load.php' ) ) {
+		throw new Exception( "Cannot find wp-load.php" );
+	}
+
+	require_once( dirname( $_SERVER["SCRIPT_FILENAME"] ) . '/wp-load.php' );
 }
 
 global $wp_async_task;
