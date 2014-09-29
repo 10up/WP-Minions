@@ -60,3 +60,7 @@ $gearman_servers = array(
 1. pip install supervisor --pre
 
 1. pecl install gearman
+
+== Other Cool Things ==
+
+[Gearman UI](http://gaspaio.github.com/gearmanui) is nice for viewing current queue/worker status. Doesn't give a TON of detail, but you get an overview of jobs names, how many are queued, and how many available workers for each job there are.
