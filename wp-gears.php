@@ -35,7 +35,16 @@ function wp_async_task_add( $hook, $args ) {
 
 
 function wp_async_task_init() {
-	$GLOBALS['wp_async_task'] = new WP_Async_Task();
+	$async_task = new WP_Async_Task();
+	$result = $async_task->init();
+
+	if ( ! $result ) {
+		// Fallback
+		unset( $async_task );
+		// todo fallback to non-gearman implementation!
+	}
+
+	$GLOBALS['wp_async_task'] = $async_task;
 }
 
 class WP_Async_Task {
@@ -52,26 +61,34 @@ class WP_Async_Task {
 
 
 	public function __construct() {
+		return $this;
+	}
+
+	public function init() {
 		// Only use gearman implementation when WP_GEARS is defined and true
 		if ( ! defined( 'WP_GEARS' ) || ! WP_GEARS ) {
 			return false;
 		}
 		global $gearman_servers;
 
-		$this->_client = new GearmanClient();
-		if ( empty( $gearman_servers ) ) {
-			$this->_client->addServer();
-		} else {
-			$this->_client->addServers( implode( ',', $gearman_servers ) );
+		if ( ! class_exists( 'GearmanClient' ) || ! class_exists( 'GearmanWorker' ) ) {
+			return false;
 		}
 
 		if ( defined( 'DOING_ASYNC' ) && DOING_ASYNC ) {
 			$this->_worker = new GearmanWorker();
 
 			if ( empty( $gearman_servers ) ) {
-				$this->_worker->addServer();
+				return $this->_worker->addServer();
 			} else {
-				$this->_worker->addServers( implode( ',', $gearman_servers ) );
+				return $this->_worker->addServers( implode( ',', $gearman_servers ) );
+			}
+		} else {
+			$this->_client = new GearmanClient();
+			if ( empty( $gearman_servers ) ) {
+				return $this->_client->addServer();
+			} else {
+				return $this->_client->addServers( implode( ',', $gearman_servers ) );
 			}
 		}
 	}
