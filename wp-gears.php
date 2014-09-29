@@ -123,3 +123,6 @@ class WP_Async_Task {
 		return true;
 	}
 }
+
+// Init
+wp_async_task_init();

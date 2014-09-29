@@ -52,6 +52,8 @@ if ( ! isset( $_SERVER['HTTP_HOST'] ) && defined( 'DOING_ASYNC' ) && DOING_ASYNC
 
 1. yum install gearmand php-pecl-gearman python-pip supervisor
 
+1. pip install supervisor --pre
+
 1. Need to copy supervisor conf to /etc/init.d/supervisord
 
 = Ubuntu =
