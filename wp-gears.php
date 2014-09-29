@@ -36,7 +36,6 @@ function wp_async_task_init() {
 	if ( ! $result ) {
 		// Fallback
 		unset( $async_task );
-		// todo fallback to non-gearman implementation!
 		$async_task = new WP_Async_Task_Fallback();
 	}
 
