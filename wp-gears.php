@@ -6,8 +6,8 @@
  * Author: Chris Marslender
  */
 
-include __DIR__ . '/inc/class-wp-async-task.php';
-include __DIR__ . '/inc/class-tc-async-task.php';
+include __DIR__ . '/inc/abstract-wp-async-task.php';
+include __DIR__ . '/inc/class-gearman-async-task.php';
 include __DIR__ . '/inc/class-wp-async-task-fallback.php';
 
 /*
@@ -30,7 +30,7 @@ function wp_async_task_add( $hook, $args ) {
 
 
 function wp_async_task_init() {
-	$async_task = new WP_Async_Task();
+	$async_task = new Gearman_Async_Task();
 	$result = $async_task->init();
 
 	if ( ! $result ) {

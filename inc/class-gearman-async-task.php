@@ -1,6 +1,6 @@
 <?php
 
-class WP_Async_Task {
+class Gearman_Async_Task extends WP_Async_Task {
 
 	/**
 	 * @var GearmanClient
@@ -11,9 +11,6 @@ class WP_Async_Task {
 	 * @var GearmanWorker
 	 */
 	protected $_worker;
-
-
-	public function __construct() {}
 
 	public function init() {
 		// Only use gearman implementation when WP_GEARS is defined and true
