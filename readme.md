@@ -33,6 +33,17 @@ $gearman_servers = array(
 
 `define( 'WP_ASYNC_TASK_SALT', 'my-unique-salt' );`
 
+= Multisite Compatability =
+
+If running the workers with php-cli when using multisite, you'll have to add the following to your wp-config.php file, after
+the block with the multisite definitions (to make sure that DOMAIN_CURRENT_SITE is set). Multisite relies on HTTP_HOST
+being set in order detect the initial site/blog
+
+`// Make sure gearman works with multisite, when invoked directly with php-cli
+if ( ! isset( $_SERVER['HTTP_HOST'] ) && defined( 'DOING_ASYNC' ) && DOING_ASYNC ) {
+	$_SERVER['HTTP_HOST'] = DOMAIN_CURRENT_SITE;
+}`
+
 = Gearman Backend - CentOS =
 
 // todo need to put the instructions here, yo.
