@@ -40,6 +40,10 @@ function wp_async_task_init() {
 	}
 
 	$GLOBALS['wp_async_task'] = $async_task;
+
+	if ( class_exists( 'Debug_Bar_Extender' ) ) {
+		Debug_Bar_Extender::instance()->trace_var( $async_task );
+	}
 }
 
 // Init
