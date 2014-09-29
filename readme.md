@@ -38,6 +38,7 @@ $gearman_servers = array(
    being set in order detect the initial site/blog
 
 `// Make sure gearman works with multisite, when invoked directly with php-cli
+
 if ( ! isset( $_SERVER['HTTP_HOST'] ) && defined( 'DOING_ASYNC' ) && DOING_ASYNC ) {
 	$_SERVER['HTTP_HOST'] = DOMAIN_CURRENT_SITE;
 }`
