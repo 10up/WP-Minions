@@ -6,9 +6,9 @@
  * Author: Chris Marslender
  */
 
-include __DIR__ . '/inc/abstract-wp-async-task.php';
-include __DIR__ . '/inc/class-gearman-async-task.php';
-include __DIR__ . '/inc/class-wp-async-task-fallback.php';
+include __DIR__ . '/includes/abstract-wp-async-task.php';
+include __DIR__ . '/includes/class-gearman-async-task.php';
+include __DIR__ . '/includes/class-wp-async-task-fallback.php';
 
 /*
  * Users with setups where multiple installs share a common wp-config.php or $table_prefix can use this to segregate jobs from each site
