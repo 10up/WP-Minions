@@ -3,8 +3,8 @@
 class WP_Async_Task_Fallback extends WP_Async_Task {
 
 	public function add( $hook, $args = array() ) {
-		// todo need to implement this
-		throw new Exception( "Gearman not configured (using callback class) - Fallback not complete yet though :-) ");
+		// todo Lets improve this - I don't particularly like the idea of falling back to wp-cron, but it works for now.
+		wp_schedule_single_event( time(), $hook, $args );
 	}
 
 }
