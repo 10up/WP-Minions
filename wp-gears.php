@@ -22,7 +22,7 @@ if ( ! defined( 'WP_ASYNC_TASK_SALT' ) ) {
  *
  * @since 0.1
  */
-function wp_async_task_add( $hook, $args ) {
+function wp_async_task_add( $hook, $args = array() ) {
 	global $wp_async_task;
 
 	return $wp_async_task->add( $hook, $args );

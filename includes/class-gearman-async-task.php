@@ -44,7 +44,7 @@ class Gearman_Async_Task extends WP_Async_Task {
 	//todo may need a CPT to track jobs in the database - For now just storing in Gearman - Will be problematic if gearmand restarts!
 	// ^^ Actually, should probably just hook gearmand up to redis, to track jobs there (Pretty sure this is possible)
 
-	public function add( $hook, $args ) {
+	public function add( $hook, $args = array() ) {
 		$jobdata = array();
 		$jobdata['hook'] = $hook;
 		$jobdata['args'] = $args;
