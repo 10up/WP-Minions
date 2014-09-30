@@ -39,7 +39,7 @@ class Gearman_Async_Task extends WP_Async_Task {
 				$this->_client->addServers( implode( ',', $gearman_servers ) );
 			}
 
-			return $this->_client->ping();
+			return $this->_client->ping( 'test' );
 		}
 	}
 
