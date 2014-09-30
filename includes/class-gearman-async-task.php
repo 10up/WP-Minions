@@ -75,7 +75,10 @@ class Gearman_Async_Task extends WP_Async_Task {
 	public function work() {
 		$this->_worker->addFunction( $this->gearman_function(), array( $this, 'do_job' ) );
 
-		while( $this->_worker->work() );
+		$this->_worker->work();
+
+		// Killing after one job, so we don't run into unexpected behaviors or memory issues. Supervisord will respawn the php processes
+		die();
 	}
 
 	public function do_job( $job ) {
