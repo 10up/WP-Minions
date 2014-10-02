@@ -101,7 +101,13 @@ class Gearman_Async_Task extends WP_Async_Task {
 			switch_to_blog( $job_data['blog_id'] );
 		}
 
+		do_action( 'wp_async_task_before_job', $job_data['hook'] );
+		do_action( 'wp_async_task_before_job_' . $job_data['hook'] );
+
 		do_action( $job_data['hook'], $job_data['args'] );
+
+		do_action( 'wp_async_task_after_job', $job_data['hook'] );
+		do_action( 'wp_async_task_after_job_' . $job_data['hook'] );
 
 		return true;
 	}
