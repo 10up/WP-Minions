@@ -41,25 +41,54 @@ $gearman_servers = array(
 	$_SERVER['HTTP_HOST'] = DOMAIN_CURRENT_SITE;
 }`
 
-= Gearman Backend - CentOS =
 
 // todo need to put the instructions here, yo.
 // These instructions are not quite complete. Plan on finishing them on Monday!
 // todo probably don't need gearman* on ubuntu - revisit and figure out which are actually needed. Does gearman* install the pecl part already??
 
+= Gearman Backend - CentOS =
+
 1. yum install gearmand php-pecl-gearman python-pip supervisor
 
-1. pip install supervisor --pre
+1. pip install supervisor --pre (older versions of pip won't use `--pre` - that's fine)
 
 1. Need to copy supervisor conf to /etc/init.d/supervisord
 
-= Ubuntu =
+1. `chkconfig supervisord on && chkconfig gearmand on`
+
+= Gearman Backend - Ubuntu =
 
 1. apt-get install gearman* python-pip
 
 1. pip install supervisor --pre
 
 1. pecl install gearman
+
+1. update-rc.d gearman-server defaults && update-rc.d supervisor defaults
+
+= Configuring Supervisor =
+
+Supervisor is used to make sure that we always have worker processes running, and is responsible for restarting each worker after a job completes.
+
+Add the following to the supervisor config file (either `/etc/supervisord.conf` or `/etc/supervisor/supervisord.conf`). If you have a `/etc/supervisor/conf.d` directory, you can also create a new config file there.
+
+`
+[program:my_wp_gears_workers]
+command=/usr/bin/php <path_to_wordpress>/wp-gears-runner.php
+process_name=%(program_name)s-%(process_num)02d
+numprocs=<number_of_workers>
+directory=<path_to_temp_directory>
+autostart=true
+autorestart=true
+killasgroup=true
+user=<user>
+`
+
+* You can change "my_wp_gears_workers" to whatever you want (after "program:") above
+* Ensure that the path to php for the "command" is correct, and fill in the path to the root of the wordpress install
+* numprocs can be changed to the number of workers you want to have running at once
+* directory should be changed to a temp working directory, that is writable by the user
+* user should be updated to the user you want your workers to run as (probably the same as your webserver user)
 
 == Other Cool Things ==
 
