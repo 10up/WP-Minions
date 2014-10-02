@@ -44,15 +44,26 @@ class Gearman_Async_Task extends WP_Async_Task {
 	}
 
 	//todo may need a CPT to track jobs in the database - For now just storing in Gearman - Will be problematic if gearmand restarts!
-	// ^^ Actually, should probably just hook gearmand up to redis, to track jobs there (Pretty sure this is possible)
+	// ^^ Actually, should probably just hook gearmand up to mysql, to track jobs there - see libmysqlclient or libdrizzle - http://gearman.org/manual/job_server/#persistent_queues
 
-	public function add( $hook, $args = array() ) {
+	public function add( $hook, $args = array(), $priority = 'normal' ) {
 		$jobdata = array();
 		$jobdata['hook'] = $hook;
 		$jobdata['args'] = $args;
 		$jobdata['blog_id'] = ( function_exists( 'is_multisite' ) && is_multisite() ) ? get_current_blog_id() : null;
 
-		return $this->_client->doBackground( $this->gearman_function(), json_encode( $jobdata ) );
+		switch( $priority ) {
+			case 'high':
+				return $this->_client->doHighBackground( $this->gearman_function(), json_encode( $jobdata ) );
+				break;
+			case 'low':
+				return $this->_client->doLowBackground( $this->gearman_function(), json_encode( $jobdata ) );
+				break;
+			case 'normal':
+			default:
+				return $this->_client->doBackground( $this->gearman_function(), json_encode( $jobdata ) );
+				break;
+		}
 	}
 
 	/**
