@@ -46,6 +46,8 @@ $gearman_servers = array(
 // These instructions are not quite complete. Plan on finishing them on Monday!
 // todo probably don't need gearman* on ubuntu - revisit and figure out which are actually needed. Does gearman* install the pecl part already??
 
+
+
 = Gearman Backend - CentOS =
 
 1. yum install gearmand php-pecl-gearman python-pip supervisor
@@ -56,6 +58,8 @@ $gearman_servers = array(
 
 1. `chkconfig supervisord on && chkconfig gearmand on`
 
+
+
 = Gearman Backend - Ubuntu =
 
 1. apt-get install gearman* python-pip
@@ -64,7 +68,9 @@ $gearman_servers = array(
 
 1. pecl install gearman
 
-1. update-rc.d gearman-server defaults && update-rc.d supervisor defaults
+1. update-rc.d gearman-job-server defaults && update-rc.d supervisor defaults
+
+
 
 = Configuring Supervisor =
 
@@ -89,6 +95,28 @@ user=<user>
 * numprocs can be changed to the number of workers you want to have running at once
 * directory should be changed to a temp working directory, that is writable by the user
 * user should be updated to the user you want your workers to run as (probably the same as your webserver user)
+
+
+
+= MySQL Persistent Job Queue - Ubuntu =
+
+Edit the gearman default config to add persistent storage options `/etc/default/gearman-job-server`
+
+Add the following, replacing values as applicable:
+
+`PARAMS="--listen=localhost -q MySQL --mysql-host=localhost --mysql-port=3306 --mysql-user=<user> --mysql-password=<password> --mysql-db=gearman --mysql-table=gearman_queue"`
+
+
+
+= MySQL Persistent Job Queue - CentOS =
+
+Edit the gearman default config to add persistent storage options `/etc/sysconfig/gearmand`
+
+Add the following, replacing values as applicable:
+
+`OPTIONS="--listen=localhost -q MySQL --mysql-host=localhost --mysql-port=3306 --mysql-user=<user> --mysql-password=<password> --mysql-db=gearman --mysql-table=gearman_queue"`
+
+
 
 == Other Cool Things ==
 
