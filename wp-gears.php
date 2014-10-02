@@ -18,7 +18,11 @@ if ( ! defined( 'WP_ASYNC_TASK_SALT' ) ) {
 }
 
 /**
- * Adds a single async task to gearman
+ * Adds a single async task to the gearman job queue.
+ *
+ * @param string $hook The action that will be called when running this job.
+ * @param array $args An array of args that should be passed to the callback when the action hook is called.
+ * @param string $priority Priority of the job (low, normal, high). Default normal.
  *
  * @since 0.1
  */
