@@ -2,9 +2,7 @@
 /**
  * WordPress Async Tasks Implementation.
  *
- * IMPORTANT: This file must be placed in the root of the WordPress install!
- *
- * // todo test/verify multisite compatability
+ * IMPORTANT: This file must be placed in (or symlinked to) the root of the WordPress install!
  */
 
 ignore_user_abort(true);
