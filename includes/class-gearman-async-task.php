@@ -25,10 +25,13 @@ class Gearman_Async_Task extends WP_Async_Task {
 
 		if ( defined( 'DOING_ASYNC' ) && DOING_ASYNC ) {
 			$this->_worker = new GearmanWorker();
+			$this->_client = new GearmanClient();
 
 			if ( empty( $gearman_servers ) ) {
+				$this->_client->addServer();
 				return $this->_worker->addServer();
 			} else {
+				$this->_client->addServers( implode( ',', $gearman_servers ) );
 				return $this->_worker->addServers( implode( ',', $gearman_servers ) );
 			}
 		} else {
