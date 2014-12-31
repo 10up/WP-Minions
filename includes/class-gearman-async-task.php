@@ -42,7 +42,8 @@ class Gearman_Async_Task extends WP_Async_Task {
 				$this->_client->addServers( implode( ',', $gearman_servers ) );
 			}
 
-			return $this->_client->ping( 'test' );
+			// Supressing errors, because this will return true or false, depending on if we could connect & communicate
+			return @$this->_client->ping( 'test' );
 		}
 	}
 
