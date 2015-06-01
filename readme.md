@@ -26,6 +26,8 @@ There are a few parts to get this all running. First, the Gearman backend needs 
 1. Make sure that remi is enabled, as well as any specific version of php you may want in ```/etc/yum.repos.d/remi.repo```
 1. ```yum install gearmand php-pecl-gearman python-pip supervisor```
 1. ```chkconfig supervisord on && chkconfig gearmand on```
+1. If everything is running on one server, I would recommend limiting connections to localhost only. If not, you'll want to set up firewall rules to only allow certain clients to connect on the Gearman port (Default 4730)
+  - edit ```/etc/sysconfig/gearmand``` - set ```OPTIONS="--listen=localhost"```
 1. ```service gearmand start```
 
 #### Backend Setup - Ubuntu
@@ -37,6 +39,9 @@ As you go through this, you may need to install additional packages, if you do n
 1. ```pecl install gearman```
 1. Once pecl install is complete, it will tell you to place something like ```extension=gearman.so``` into your php.ini file - Do this.
 1. ```update-rc.d gearman-job-server defaults && update-rc.d supervisor defaults```
+1. If everything is running on one server, I would recommend limiting connections to localhost only. If not, you'll want to set up firewall rules to only allow certain clients to connect on the Gearman port (Default 4730)
+  - edit ```/etc/default/gearman-job-server``` - set ```PARAMS="--listen=localhost"```
+1. ```service gearmand restart```
 
 #### Supervisor Configuration
 
@@ -97,16 +102,16 @@ By default, gearman will store the job queue in memory. If for whatever reason t
 
 #### CentOS
 
-Edit the gearman config at ```/etc/sysconfig/gearmand```, adding the following line, inserting database credentials as necessary:
+Edit the gearman config at ```/etc/sysconfig/gearmand```, adding the following to the OPTIONS line (or creating the line, if it doesn't exist yet), inserting database credentials as necessary:
 ```sh
-OPTIONS="--listen=localhost -q MySQL --mysql-host=localhost --mysql-port=3306 --mysql-user=<user> --mysql-password=<password> --mysql-db=gearman --mysql-table=gearman_queue"
+OPTIONS="-q MySQL --mysql-host=localhost --mysql-port=3306 --mysql-user=<user> --mysql-password=<password> --mysql-db=gearman --mysql-table=gearman_queue"
 ```
 
 #### Ubuntu
 
-Edit the gearman config at ```/etc/default/gearman-job-server```, adding the following line, inserting database credentials as necessary:
+Edit the gearman config at ```/etc/default/gearman-job-server```, adding the following to the PARAMS line (or creating the line, if it doesn't exist yet), inserting database credentials as necessary:
 ```sh
-`PARAMS="--listen=localhost -q MySQL --mysql-host=localhost --mysql-port=3306 --mysql-user=<user> --mysql-password=<password> --mysql-db=gearman --mysql-table=gearman_queue"`
+PARAMS="-q MySQL --mysql-host=localhost --mysql-port=3306 --mysql-user=<user> --mysql-password=<password> --mysql-db=gearman --mysql-table=gearman_queue"
 ```
 
 ## Verification
