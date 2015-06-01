@@ -1,84 +1,48 @@
-=== Plugin Name ===
-Contributors: cmmarslender
-Tags: gearman, async
-Requires at least: 4/0.0
-Tested up to: 4.0
-Stable tag: 1.0
+WP Gears
+=============
 
-Provides methods to schedule async tasks using gearman
+Integrate [Gearman](http://gearman.org/) with [WordPress](http://wordpress.org/) for asynchronous task running.
 
-== Description ==
+## Background & Purpose
 
-blah blah blah. Should probably come up with a better description.
+As WordPress becomes a more popular publishing platform for increasingly large publishers, with complex workflows, the need for increasingly complex and resource-intensive tasks has only increased. Things like generating reports, expensive API calls, syncing users to mail providers, or even ingesting content from feeds all take a lot of time or a lot of memory (or both), and commonly can't finish within common limitations of web servers, because things like timeouts and memory limits get in the way.
 
-== Installation ==
+WP Gears provides a few helper functions that allow you to add tasks to a queue, and specify an action that should be called to trigger the task, just hook a callback into the action using ```add_action()```
 
-1. Upload wp-gears-runner.php to the root of the WordPress install (or create a symlink).
+During configuration, a number of workers are specified. As workers are free, they will take the next task from the queue, call the action, and any callbacks hooked into the action will be run.
 
-1. Get the gearman backend working. See below.
+In the situation of needing more ram or higher timeouts, a separate server to process the tasks is ideal - Just set up WordPress on that server like the standard web servers, and up the resources. Make sure not to send any production traffic to the server, and it will exclusively handle tasks from the queue.
 
-1. Add this line the top of `wp-config.php` to activate WP Gears:
+## Installation
 
-`define('WP_GEARS', true);`
+There are a few parts to get this all running. First, the Gearman backend needs to be setup - this part will vary depending on your OS. Once that is complete, we can install the WordPress plugin, and set the configuration options for WordPress.
 
-1. Define your gearman servers in `wp-config.php` if not using default server (127.0.0.1:4730)
+#### Backend Setup - CentOS 6.x
 
-`global $gearman_servers;
+1. You'll need the [EPEL](https://fedoraproject.org/wiki/EPEL) repo for gearman, and the [REMI](http://rpms.famillecollet.com/) repo for some of the php packages. Make sure to enable the appropriate remi repo for the version of php you are using.
+  - ```wget http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm && rpm -Uvh epel-release-6*.rpm```
+  - ```wget http://rpms.famillecollet.com/enterprise/remi-release-6.rpm && rpm -Uvh remi-release-6*.rpm```
+  - ```rm *.rpm```
+1. Make sure that remi is enabled, as well as any specific version of php you may want in ```/etc/yum.repos.d/remi.repo```
+1. ```yum install gearmand php-pecl-gearman python-pip supervisor```
+1. ```chkconfig supervisord on && chkconfig gearmand on```
+1. ```service gearmand start```
 
-$gearman_servers = array(
-	'127.0.0.1:4730',
-);`
+#### Backend Setup - Ubuntu
 
-1. Define a unique salt in `wp-config.php` so that multiple sites on the same server don't conflict.
+As you go through this, you may need to install additional packages, if you do not have them already, such as php-pear or a php*-dev package
 
-`define( 'WP_ASYNC_TASK_SALT', 'my-unique-salt' );`
+1. ```apt-get update```
+1. ```apt-get install gearman python-pip libgearman-dev supervisor```
+1. ```pecl install gearman```
+1. Once pecl install is complete, it will tell you to place something like ```extension=gearman.so``` into your php.ini file - Do this.
+1. ```update-rc.d gearman-job-server defaults && update-rc.d supervisor defaults```
 
-1. If running the workers with php-cli AND using multisite, you'll have to add the following to your wp-config.php file, after
-   the block with the multisite definitions (to make sure that DOMAIN_CURRENT_SITE is set). Multisite relies on HTTP_HOST
-   being set in order detect the initial site/blog
+#### Supervisor Configuration
 
-`if ( ! isset( $_SERVER['HTTP_HOST'] ) && defined( 'DOING_ASYNC' ) && DOING_ASYNC ) {
-	$_SERVER['HTTP_HOST'] = DOMAIN_CURRENT_SITE;
-}`
+Filling in values in ```<brackets>``` as required, add the following config to either ```/etc/supervisord.conf``` (CentOS) or ```/etc/supervisor/supervisord.conf``` (Ubuntu)
 
-
-// todo need to put the instructions here, yo.
-// These instructions are not quite complete. Plan on finishing them on Monday!
-// todo probably don't need gearman* on ubuntu - revisit and figure out which are actually needed. Does gearman* install the pecl part already??
-
-
-
-= Gearman Backend - CentOS =
-
-1. yum install gearmand php-pecl-gearman python-pip supervisor
-
-1. pip install supervisor --pre (older versions of pip won't use `--pre` - that's fine)
-
-1. Need to copy supervisor conf to /etc/init.d/supervisord
-
-1. `chkconfig supervisord on && chkconfig gearmand on`
-
-
-
-= Gearman Backend - Ubuntu =
-
-1. apt-get install gearman* python-pip
-
-1. pip install supervisor --pre
-
-1. pecl install gearman
-
-1. update-rc.d gearman-job-server defaults && update-rc.d supervisor defaults
-
-
-
-= Configuring Supervisor =
-
-Supervisor is used to make sure that we always have worker processes running, and is responsible for restarting each worker after a job completes.
-
-Add the following to the supervisor config file (either `/etc/supervisord.conf` or `/etc/supervisor/supervisord.conf`). If you have a `/etc/supervisor/conf.d` directory, you can also create a new config file there.
-
-`
+```sh
 [program:my_wp_gears_workers]
 command=/usr/bin/php <path_to_wordpress>/wp-gears-runner.php
 process_name=%(program_name)s-%(process_num)02d
@@ -88,36 +52,103 @@ autostart=true
 autorestart=true
 killasgroup=true
 user=<user>
-`
+```
 
-* You can change "my_wp_gears_workers" to whatever you want (after "program:") above
-* Ensure that the path to php for the "command" is correct, and fill in the path to the root of the wordpress install
-* numprocs can be changed to the number of workers you want to have running at once
-* directory should be changed to a temp working directory, that is writable by the user
-* user should be updated to the user you want your workers to run as (probably the same as your webserver user)
+* path_to_wordpress: Absolute path to the root of your WordPress install, ex: ```/var/www/html/wordpress```
+* number_of_workers: How many workers should be spawned (How many jobs can be running at once).
+* path_to_temp_directory: probably should just be the same as path_to_wordpress.
+* user: The system user to run the processes under, probably apache, nginx, or www-data.
+* You can optionally change the "my_wp_gears_workers" text to something more descriptive, if you'd like.
 
+#### Configuring WordPress
 
+* Install the plugin in WordPress. If desired, you can [download a zip](http://github.com/10up/WP-Gears/archive/master.zip) and install via the WordPress plugin installer.
 
-= MySQL Persistent Job Queue - Ubuntu =
+* Create a symlink at the site root (the same directory as ```wp-settings.php```) that points to the ```wp-gears-runner.php``` file in the plugin (or copy the file, but a symlink will ensure it is updated if the plugin is updated)
 
-Edit the gearman default config to add persistent storage options `/etc/default/gearman-job-server`
+* Add this line the top of ```wp-config.php``` to activate WP Gears:
+```php
+define('WP_GEARS', true);
+```
 
-Add the following, replacing values as applicable:
+* If your gearman service not running locally or uses a non-standard port, you'll need define your gearman servers in ```wp-config.php```
+```php
+global $gearman_servers;
+$gearman_servers = array(
+	'127.0.0.1:4730',
+);
+```
 
+* Define a unique salt in `wp-config.php` so that multiple installs don't conflict.
+```php
+define( 'WP_ASYNC_TASK_SALT', 'my-unique-salt-1' );
+```
+
+**Note:** If you are using multisite, you'll also have to add the following to your ```wp-config.php``` file, _after_ the block with the multisite definitions. This is due to the fact that multisite relies on ```HTTP_HOST``` to detect the site/blog it is running under. You'll also want to make sure you are actually defining ```DOMAIN_CURRENT_SITE``` in the multisite configuration.
+```php
+if ( ! isset( $_SERVER['HTTP_HOST'] ) && defined( 'DOING_ASYNC' ) && DOING_ASYNC ) {
+	$_SERVER['HTTP_HOST'] = DOMAIN_CURRENT_SITE;
+}
+```
+
+## MySQL Persistent Queue (Recommended)
+
+By default, gearman will store the job queue in memory. If for whatever reason the gearman service goes away, so does the queue. For persistence, you can optionally use a MySQL database for the job queue:
+
+#### CentOS
+
+Edit the gearman config at ```/etc/sysconfig/gearmand```, adding the following line, inserting database credentials as necessary:
+```sh
+OPTIONS="--listen=localhost -q MySQL --mysql-host=localhost --mysql-port=3306 --mysql-user=<user> --mysql-password=<password> --mysql-db=gearman --mysql-table=gearman_queue"
+```
+
+#### Ubuntu
+
+Edit the gearman config at ```/etc/default/gearman-job-server```, adding the following line, inserting database credentials as necessary:
+```sh
 `PARAMS="--listen=localhost -q MySQL --mysql-host=localhost --mysql-port=3306 --mysql-user=<user> --mysql-password=<password> --mysql-db=gearman --mysql-table=gearman_queue"`
+```
+
+## Verification
+
+Once everything is installed, you can quickly make sure gearman is accepting jobs with the ```test-client.php``` and ```test-worker.php``` files. The worker is configured to reverse any text passed to it. In the client file, we pass "Hello World" to the worker.
+
+In one window, run ```php test-worker.php``` - You'll now have one worker process running, waiting for jobs.
+
+In another window, run ```php test-client.php "Hello World"``` - You should see "dlroW olleH" printed on your screen.
+
+```ctrl-c``` will stop the worker once you are done testing.
+
+## Usage
+
+Once configured and activated, you'll have access to ```wp_async_task_add()```. If you are at all familiar with ```wp_schedule_single_event()```, the way ```wp_async_task_add()``` works should be very familiar to you.
+
+The function takes up to three arguments, the first of which is required:
+
+1. ```$hook```: This is the name of the action hook to execute when the job runs. Your callback function should hook into this with ```add_action( $hook, $callback )```
+1. ```$args```: This is optional, and defaults to an empty array. You can pass an array of arbitrary data to this, and it will be passed to your callback function.
+1. ```$priority```: This is optional, and defaults to "normal". Other valid options are "high" or "low". High priority jobs will be run before normal priority jobs, even if they normal priority job has been in the queue longer.
+
+Set an option in the database, when a worker becomes available:
+
+```php
+// Add a task, that will call the "myplugin_update_option" action when it is run
+wp_async_task_add( 'myplugin_update_option', array( 'mykey' => 'myvalue' ) );
+
+function myplugin_update_option_callback( $args ) {
+	// In reality, you are probably doing a lot of resource intensive work here
+	update_option( 'my-option-name', $args['mykey'] );
+}
+
+// Add the action that links the task and the callback.
+// Notice the hook below is the same as the hook provided to wp_async_task_add.
+add_action( 'myplugin_update_option', 'myplugin_update_option_callback' );
+
+```
+Once a worker is free, and runs the above task, you'd have an option called "my-option-name" in the options table, with a value of "myvalue", since "myvalue" was passed in via the ```$args```
 
 
 
-= MySQL Persistent Job Queue - CentOS =
+## Gearman UI
 
-Edit the gearman default config to add persistent storage options `/etc/sysconfig/gearmand`
-
-Add the following, replacing values as applicable:
-
-`OPTIONS="--listen=localhost -q MySQL --mysql-host=localhost --mysql-port=3306 --mysql-user=<user> --mysql-password=<password> --mysql-db=gearman --mysql-table=gearman_queue"`
-
-
-
-== Other Cool Things ==
-
-[Gearman UI](http://gaspaio.github.com/gearmanui) is nice for viewing current queue/worker status. Doesn't give a TON of detail, but you get an overview of jobs names, how many are queued, and how many available workers for each job there are.
+[Gearman UI](http://gaspaio.github.com/gearmanui) is a simple UI for viewing current queue/worker status. It doesn't give a _ton_ of detail, but you get an overview of jobs names, how many are queued, and how many available workers for each job there are.
