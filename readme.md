@@ -153,7 +153,10 @@ add_action( 'myplugin_update_option', 'myplugin_update_option_callback' );
 Once a worker is free, and runs the above task, you'd have an option called "my-option-name" in the options table, with a value of "myvalue", since "myvalue" was passed in via the ```$args```
 
 
+## Issues
 
-## Gearman UI
+If you identify any errors or have an idea for improving the plugin, please [open an issue](https://github.com/10up/WP-Gears/issues). We're excited to see what the community thinks of this project, and we would love your input!
 
-[Gearman UI](http://gaspaio.github.com/gearmanui) is a simple UI for viewing current queue/worker status. It doesn't give a _ton_ of detail, but you get an overview of jobs names, how many are queued, and how many available workers for each job there are.
+## License
+
+WP Gears is free software; you can redistribute it and/or modify it under the terms of the [GNU General Public License](http://www.gnu.org/licenses/gpl-2.0.html) as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
