@@ -1,9 +1,11 @@
 <?php
 /**
  * Plugin Name: WP Gears
- * Description: Provides methods for scheduling async tasks using Gearman
- * Version: 0.1
- * Author: Chris Marslender
+ * Description: Integrates Gearman with WordPress
+ * Version: 1.0
+ * Author: Chris Marslender, 10up
+ * Author URI: http://10up.com/
+ * License: GPLv2 or later
  */
 
 include __DIR__ . '/includes/abstract-wp-async-task.php';
