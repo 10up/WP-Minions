@@ -1,6 +1,7 @@
 {
     "name": "10up/wp-gears",
     "description": "Integrate Gearman with WordPress",
+    "type": "wordpress-plugin",
     "license": "GPLv2",
     "authors": [
         {
@@ -12,5 +13,7 @@
             "homepage": "http://10up.com"
         }
     ],
-    "require": {}
+    "require": {
+        "composer/installers": "~1.0"
+    }
 }
