@@ -1,0 +1,23 @@
+# Version Control
+.svn
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.buildpath
+.project
+.settings/
+.build/
+.idea/
+nbproject/
+
+# Compass/SASS/SCSS
+.sass-cache
+
+# Other
+node_modules
+
+/vendor/
+/release/

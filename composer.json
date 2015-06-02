@@ -1,0 +1,16 @@
+{
+    "name": "10up/wp-gears",
+    "description": "Integrate Gearman with WordPress",
+    "license": "GPLv2",
+    "authors": [
+        {
+            "name": "Chris Marslender",
+            "email": "chrismarslender@gmail.com"
+        },
+        {
+            "name": "10up",
+            "homepage": "http://10up.com"
+        }
+    ],
+    "require": {}
+}
