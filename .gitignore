@@ -12,6 +12,7 @@ Thumbs.db
 .build/
 .idea/
 nbproject/
+.editorconfig
 
 # Compass/SASS/SCSS
 .sass-cache
