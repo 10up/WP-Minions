@@ -5,6 +5,16 @@
  * IMPORTANT: This file must be placed in (or symlinked to) the root of the WordPress install!
  */
 
+/**
+ * The libgearman extension is not compatible with HHVM. We exit early
+ * here to prevent HHVM from hanging and then crashing eventually.
+ */
+if ( defined( 'HHVM_VERSION' ) ) {
+	die(
+		"Fatal Error: WP Gears and the libgearman extension are not compatible with HHVM.\n"
+	);
+}
+
 ignore_user_abort(true);
 
 if ( ! empty( $_POST ) || defined( 'DOING_AJAX' ) || defined( 'DOING_ASYNC' ) ) {
