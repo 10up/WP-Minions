@@ -24,7 +24,8 @@ There are a few parts to get this all running. First, the Gearman backend needs 
   - ```wget http://rpms.famillecollet.com/enterprise/remi-release-6.rpm && rpm -Uvh remi-release-6*.rpm```
   - ```rm *.rpm```
 1. Make sure that remi is enabled, as well as any specific version of php you may want in ```/etc/yum.repos.d/remi.repo```
-1. ```yum install gearmand php-pecl-gearman python-pip supervisor```
+1. ```yum install gearmand php-pecl-gearman python-pip```
+1. ```easy_install supervisor```
 1. ```chkconfig supervisord on && chkconfig gearmand on```
 1. If everything is running on one server, I would recommend limiting connections to localhost only. If not, you'll want to set up firewall rules to only allow certain clients to connect on the Gearman port (Default 4730)
   - edit ```/etc/sysconfig/gearmand``` - set ```OPTIONS="--listen=localhost"```
