@@ -16,5 +16,10 @@
     "require": {
         "composer/installers": "~1.0",
 		"phpunit/phpunit": "~3.7"
-    }
+    },
+	"autoload": {
+		"psr-4": {
+			"WpGears\\": "includes/WpGears"
+		}
+	}
 }
