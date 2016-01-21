@@ -170,7 +170,7 @@ class Client extends BaseClient {
 	 */
 	function get_blog_id() {
 		if ( is_null( $this->blog_id ) ) {
-			if ( defined( 'is_multisite' ) && is_multisite() ) {
+			if ( function_exists( 'is_multisite' ) && is_multisite() ) {
 				$this->blog_id = get_current_blog_id();
 			} else {
 				$this->blog_id = false;
