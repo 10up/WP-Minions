@@ -27,6 +27,8 @@ class WpGearsTest extends \WP_UnitTestCase {
 		$mock = \Mockery::mock()
 			->shouldReceive( 'register' )
 			->atMost(1)
+			->shouldReceive( 'addServer' )
+			->atMost(1)
 			->andReturn( true )
 			->shouldReceive( 'add' )
 			->with( 'action_b', array( 1, 2, 3 ), 'low' )
