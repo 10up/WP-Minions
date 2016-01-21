@@ -1,0 +1,25 @@
+language: php
+
+php:
+  - 5.3
+  - 5.4
+  - 5.5
+
+env:
+  - WP_VERSION=latest WP_MULTISITE=0
+  - WP_VERSION=3.9 WP_MULTISITE=0
+  - WP_VERSION=latest WP_MULTISITE=1
+  - WP_VERSION=3.9 WP_MULTISITE=1
+
+branches:
+  except:
+    - /^dist-.*$/
+
+install:
+  - composer install --dev
+
+before_script:
+  - bash bin/install-wp-tests.sh wordpress_test travis ''  localhost $WP_VERSION
+
+script:
+  - ./vendor/bin/phpunit
