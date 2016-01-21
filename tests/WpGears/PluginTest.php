@@ -81,7 +81,7 @@ class PluginTest extends \WP_UnitTestCase {
 	}
 
 	function test_it_will_build_a_gearman_worker_if_gearman_is_absent() {
-		if ( ! class_exists( '\GearmanWorker' ) ) {
+		if ( class_exists( '\GearmanWorker' ) ) {
 			$klass = '\GearmanWorker';
 			$actual = $this->plugin->build_worker();
 			$this->assertInstanceOf(
