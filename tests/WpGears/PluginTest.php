@@ -10,6 +10,7 @@ class PluginTest extends \WP_UnitTestCase {
 		parent::setUp();
 
 		$this->plugin = new Plugin();
+		$this->config_prefix = 'A' . uniqid();
 	}
 
 	function tearDown() {

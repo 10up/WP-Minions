@@ -135,7 +135,7 @@ class GearmanClientTest extends \WP_UnitTestCase {
 		$payload = array(
 			'hook'    => 'action_b',
 			'args'    => array(),
-			'blog_id' => is_multisite() ? get_current_blog_id() : false,
+			'blog_id' => function_exists( 'is_multisite' ) && is_multisite() ? get_current_blog_id() : false,
 		);
 
 		$group = defined( 'WP_ASYNC_TASK_SALT' ) ? WP_ASYNC_TASK_SALT . ':WP_Async_Task' : '';
