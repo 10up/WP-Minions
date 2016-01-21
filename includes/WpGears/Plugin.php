@@ -275,7 +275,8 @@ class Plugin {
 	 * @return bool True or false depending on whether the config is present
 	 */
 	function has_config( $constant ) {
-		return ! empty( $this->get_config( $constant ) );
+		$value = $this->get_config( $constant );
+		return ! empty( $value );
 	}
 
 	/**
