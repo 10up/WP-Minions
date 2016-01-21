@@ -72,10 +72,6 @@ user=<user>
 
 * Create a symlink at the site root (the same directory as ```wp-settings.php```) that points to the ```wp-gears-runner.php``` file in the plugin (or copy the file, but a symlink will ensure it is updated if the plugin is updated)
 
-* Add this line the top of ```wp-config.php``` to activate WP Gears:
-```php
-define('WP_GEARS', true);
-```
 
 * If your gearman service not running locally or uses a non-standard port, you'll need define your gearman servers in ```wp-config.php```
 ```php
