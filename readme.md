@@ -153,6 +153,22 @@ add_action( 'myplugin_update_option', 'myplugin_update_option_callback' );
 ```
 Once a worker is free, and runs the above task, you'd have an option called "my-option-name" in the options table, with a value of "myvalue", since "myvalue" was passed in via the ```$args```
 
+## Customization
+
+The following constants can be used to customize the behaviour of WP Gears.
+
+1. `WP_GEARS_JOBS_PER_WORKER` - The number of jobs to execute per Worker,
+   default is 1. Running multiple jobs per worker will reduce the number
+   workers spawned, and can significantly boost performance. However too
+   large a value will cause issues if you have memory leaks. Use with
+   caution.
+
+2. `WP_GEARS_CLIENT_CLASS` - You can also alter the Client class used to
+   send jobs to Gearman. It should match the interface of
+   `\WpGears\Client`.
+
+3. `WP_GEARS_WORKER_CLASS` - Similarly you can alter the Worker class used
+   to execute jobs. It should match the interface of `\WpGears\Worker`.
 
 ## Issues
 
