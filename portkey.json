@@ -1,0 +1,10 @@
+{
+  "includes/WpGears/*.php": {
+    "type": "plugin",
+    "test": "tests/WpGears/%sTest.php"
+  },
+  "tests/WpGears/*Test.php": {
+    "type": "test",
+    "alternate": "includes/WpGears/%s.php"
+  }
+}

@@ -2,15 +2,13 @@
 /**
  * Plugin Name: WP Gears
  * Description: Integrates Gearman with WordPress
- * Version: 1.0
- * Author: Chris Marslender, 10up
+ * Version: 2.0
+ * Author: Chris Marslender, Darshan Sawardekar, 10up
  * Author URI: http://10up.com/
  * License: GPLv2 or later
  */
 
-include __DIR__ . '/includes/abstract-wp-async-task.php';
-include __DIR__ . '/includes/class-gearman-async-task.php';
-include __DIR__ . '/includes/class-wp-async-task-fallback.php';
+require_once __DIR__ . '/autoload.php';
 
 /*
  * Users with setups where multiple installs share a common wp-config.php or $table_prefix can use this to segregate jobs from each site
@@ -29,27 +27,19 @@ if ( ! defined( 'WP_ASYNC_TASK_SALT' ) ) {
  * @since 0.1
  */
 function wp_async_task_add( $hook, $args = array(), $priority = 'normal' ) {
-	global $wp_async_task;
+	$plugin = \WpGears\Plugin::get_instance();
 
-	return $wp_async_task->add( $hook, $args, $priority );
+	return $plugin->add( $hook, $args, $priority );
 }
-
 
 function wp_async_task_init() {
-	$async_task = new Gearman_Async_Task();
-	$result = $async_task->init();
+	wp_gears_autoloader();
 
-	if ( ! $result ) {
-		// Fallback
-		unset( $async_task );
-		$async_task = new WP_Async_Task_Fallback();
-	}
+	$plugin = \WpGears\Plugin::get_instance();
+	$plugin->enable();
 
-	$GLOBALS['wp_async_task'] = $async_task;
+	$GLOBALS['wp_async_task'] = $plugin;
 }
-
-// Init
-wp_async_task_init();
 
 add_action( 'plugins_loaded', function() {
 	global $wp_async_task;
@@ -58,3 +48,9 @@ add_action( 'plugins_loaded', function() {
 		Debug_Bar_Extender::instance()->trace_var( $wp_async_task );
 	}
 });
+
+// Init
+if ( ! defined( 'PHPUNIT_RUNNER' ) ) {
+	wp_async_task_init();
+}
+
