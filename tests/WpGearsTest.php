@@ -35,6 +35,7 @@ class WpGearsTest extends \WP_UnitTestCase {
 			->getMock();
 
 		$plugin = \WpGears\Plugin::get_instance();
+		$plugin->config_prefix = 'C' . uniqid();
 		$plugin->client = $mock;
 
 		$actual = wp_async_task_add( 'action_b', array( 1, 2, 3 ), 'low' );

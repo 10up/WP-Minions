@@ -34,6 +34,7 @@ class WpGearsRunnerTest extends \WP_UnitTestCase {
 			->getMock();
 
 		$plugin = \WpGears\Plugin::get_instance();
+		$plugin->config_prefix = 'B' . uniqid();
 		$plugin->worker = $mock;
 
 		$actual = wp_gears_runner();
