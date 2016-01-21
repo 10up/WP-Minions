@@ -71,7 +71,7 @@ class PluginTest extends \WP_UnitTestCase {
 
 	function test_it_will_build_a_gearman_client_if_gearman_is_present() {
 		if ( ! class_exists( '\GearmanClient' ) ) {
-			$mock = \Mockery::mock( 'GearmanClient' );
+			$mock = \Mockery::mock( 'FakeGearmanClient' );
 			$klass = get_class( $mock );
 		} else {
 			$klass = '\GearmanClient';
@@ -85,7 +85,7 @@ class PluginTest extends \WP_UnitTestCase {
 
 	function test_it_will_build_a_gearman_worker_if_gearman_is_absent() {
 		if ( ! class_exists( '\GearmanWorker' ) ) {
-			$mock = \Mockery::mock( 'GearmanWorker' );
+			$mock = \Mockery::mock( 'FakeGearmanWorker' );
 			$klass = get_class( $mock );
 		} else {
 			$klass = '\GearmanWorker';
