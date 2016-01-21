@@ -81,7 +81,7 @@ class GearmanClientTest extends \WP_UnitTestCase {
 	}
 
 	function test_it_has_a_blog_id_if_on_multisite() {
-		if ( defined( 'is_multisite' ) && is_multisite() ) {
+		if ( function_exists( 'is_multisite' ) && is_multisite() ) {
 			$actual = $this->client->get_blog_id();
 			$this->assertEquals( 1, $actual );
 		} else {
@@ -90,7 +90,7 @@ class GearmanClientTest extends \WP_UnitTestCase {
 	}
 
 	function test_it_does_not_have_blog_id_on_single_site() {
-		if ( ! ( defined( 'is_multisite' ) && is_multisite() ) ) {
+		if ( ! ( function_exists( 'is_multisite' ) && is_multisite() ) ) {
 			$actual = $this->client->get_blog_id();
 			$this->assertFalse( $actual );
 		} else {
