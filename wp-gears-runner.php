@@ -1,46 +1,43 @@
 <?php
 /**
- * WordPress Async Tasks Implementation.
+ * WpGears Runner
  *
  * IMPORTANT: This file must be placed in (or symlinked to) the root of the WordPress install!
- */
-
-/**
- * The libgearman extension is not compatible with HHVM. We exit early
- * here to prevent HHVM from hanging and then crashing eventually.
- */
-if ( defined( 'HHVM_VERSION' ) ) {
-	die(
-		"Fatal Error: WP Gears and the libgearman extension are not compatible with HHVM.\n"
-	);
-}
-
-ignore_user_abort(true);
-
-if ( ! empty( $_POST ) || defined( 'DOING_AJAX' ) || defined( 'DOING_ASYNC' ) ) {
-	die();
-}
-
-/**
- * Tell WordPress we are doing the ASYNC task.
  *
- * @var bool
+ * If Composer is present it will be used, Else a custom autoloader will
+ * be used in it's place.
  */
-define('DOING_ASYNC', true);
 
-if ( ! defined( 'ABSPATH' ) ) {
-	/** Set up WordPress environment - using SCRIPT_FILENAME so that this file works even if its a symlink! */
-	if ( ! file_exists( dirname( $_SERVER["SCRIPT_FILENAME"] ) . '/wp-load.php' ) ) {
-		throw new Exception( "Cannot find wp-load.php" );
+require_once __DIR__ . '/autoload.php';
+
+function wp_gears_runner() {
+	wp_gears_autoloader();
+
+	$plugin = \WpGears\Plugin::get_instance();
+	$plugin->enable();
+
+	return $plugin->run();
+}
+
+if ( ! defined( 'PHPUNIT_RUNNER' ) ) {
+	ignore_user_abort( true );
+
+	if ( ! empty( $_POST ) || defined( 'DOING_AJAX' ) || defined( 'DOING_ASYNC' ) ) {
+		die();
 	}
 
-	require_once( dirname( $_SERVER["SCRIPT_FILENAME"] ) . '/wp-load.php' );
+	define( 'DOING_ASYNC', true );
+
+	if ( ! defined( 'ABSPATH' ) ) {
+		/** Set up WordPress environment - using SCRIPT_FILENAME so that this file works even if its a symlink! */
+		if ( ! file_exists( dirname( $_SERVER["SCRIPT_FILENAME"] ) . '/wp-load.php' ) ) {
+			error_log(
+				'WP Gears Fatal Error - Cannot find wp-load.php'
+			);
+		}
+
+		require_once( dirname( $_SERVER["SCRIPT_FILENAME"] ) . '/wp-load.php' );
+	}
+
+	wp_gears_runner();
 }
-
-global $wp_async_task;
-
-if ( method_exists( $wp_async_task, 'work' ) ) {
-	$wp_async_task->work();
-}
-
-die();
