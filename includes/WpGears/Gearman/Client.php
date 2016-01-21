@@ -37,6 +37,7 @@ class Client extends BaseClient {
 
 		if ( $client !== false ) {
 			$servers = $this->get_servers();
+			var_dump( $client );
 
 			if ( empty( $servers ) ) {
 				return $client->addServer();
