@@ -70,31 +70,24 @@ class PluginTest extends \WP_UnitTestCase {
 	}
 
 	function test_it_will_build_a_gearman_client_if_gearman_is_present() {
-		if ( ! class_exists( '\GearmanClient' ) ) {
-			$mock = \Mockery::mock( 'FakeGearmanClient' );
-			$klass = get_class( $mock );
-		} else {
+		if ( class_exists( '\GearmanClient' ) ) {
 			$klass = '\GearmanClient';
-		}
+			$actual = $this->plugin->build_client();
 
-		$actual = $this->plugin->build_client();
-		$this->assertInstanceOf(
-			'\WpGears\Gearman\Client', $actual
-		);
+			$this->assertInstanceOf(
+				'\WpGears\Gearman\Client', $actual
+			);
+		}
 	}
 
 	function test_it_will_build_a_gearman_worker_if_gearman_is_absent() {
 		if ( ! class_exists( '\GearmanWorker' ) ) {
-			$mock = \Mockery::mock( 'FakeGearmanWorker' );
-			$klass = get_class( $mock );
-		} else {
 			$klass = '\GearmanWorker';
+			$actual = $this->plugin->build_worker();
+			$this->assertInstanceOf(
+				'\WpGears\Gearman\Worker', $actual
+			);
 		}
-
-		$actual = $this->plugin->build_worker();
-		$this->assertInstanceOf(
-			'\WpGears\Gearman\Worker', $actual
-		);
 	}
 
 	function test_it_will_build_a_cron_client_if_gearman_is_missing() {
