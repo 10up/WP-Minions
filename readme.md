@@ -1,5 +1,5 @@
-WP Gears
-=============
+WP Gears [![Build Status](https://travis-ci.org/10up/WP-Gears.svg?branch=master)](https://travis-ci.org/10up/WP-Gears)
+========
 
 Integrate [Gearman](http://gearman.org/) with [WordPress](http://wordpress.org/) for asynchronous task running.
 
