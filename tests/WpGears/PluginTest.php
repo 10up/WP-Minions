@@ -174,6 +174,7 @@ class PluginTest extends \WP_UnitTestCase {
 	}
 
 	function test_it_will_build_client_and_worker_on_enabled() {
+		var_dump( $this->plugin->client );
 		$this->plugin->enable();
 
 		$this->assertInstanceOf(
