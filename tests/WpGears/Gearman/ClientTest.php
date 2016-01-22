@@ -102,8 +102,7 @@ class GearmanClientTest extends \WP_UnitTestCase {
 		if ( defined( 'WP_ASYNC_TASK_SALT' ) ) {
 			$expected = WP_ASYNC_TASK_SALT . ':WP_Async_Task';
 		} else {
-			define( 'WP_ASYNC_TASK_SALT', 'foo' );
-			$expected = 'foo:WP_Async_Task';
+			$expected = 'WP_Async_Task';
 		}
 
 		$actual = $this->client->get_async_group();
@@ -138,7 +137,7 @@ class GearmanClientTest extends \WP_UnitTestCase {
 			'blog_id' => function_exists( 'is_multisite' ) && is_multisite() ? get_current_blog_id() : false,
 		);
 
-		$group = defined( 'WP_ASYNC_TASK_SALT' ) ? WP_ASYNC_TASK_SALT . ':WP_Async_Task' : '';
+		$group = defined( 'WP_ASYNC_TASK_SALT' ) ? WP_ASYNC_TASK_SALT . ':WP_Async_Task' : 'WP_Async_Task';
 		$mock = \Mockery::mock()
 			->shouldReceive('doBackground')
 			->with( $group, json_encode( $payload ) )
@@ -157,7 +156,7 @@ class GearmanClientTest extends \WP_UnitTestCase {
 			'blog_id' => is_multisite() ? get_current_blog_id() : false,
 		);
 
-		$group = defined( 'WP_ASYNC_TASK_SALT' ) ? WP_ASYNC_TASK_SALT . ':WP_Async_Task' : '';
+		$group = defined( 'WP_ASYNC_TASK_SALT' ) ? WP_ASYNC_TASK_SALT . ':WP_Async_Task' : 'WP_Async_Task';
 		$mock = \Mockery::mock()
 			->shouldReceive('doHighBackground')
 			->with( $group, json_encode( $payload ) )
