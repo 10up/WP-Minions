@@ -22,7 +22,7 @@ class CronClientTest extends \WP_UnitTestCase {
 		$this->assertTrue( $actual );
 
 		$next_event = wp_next_scheduled( 'cron_action_a', array() );
-		$this->assertEquals( time(), $next_event );
+		$this->assertEquals( time(), $next_event, '', 1000 );
 	}
 
 }
