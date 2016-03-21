@@ -42,7 +42,7 @@ As you go through this, you may need to install additional packages, if you do n
 1. ```update-rc.d gearman-job-server defaults && update-rc.d supervisor defaults```
 1. If everything is running on one server, I would recommend limiting connections to localhost only. If not, you'll want to set up firewall rules to only allow certain clients to connect on the Gearman port (Default 4730)
   - edit ```/etc/default/gearman-job-server``` - set ```PARAMS="--listen=localhost"```
-1. ```service gearmand restart```
+1. ```service gearman-job-server restart```
 
 #### Supervisor Configuration
 
