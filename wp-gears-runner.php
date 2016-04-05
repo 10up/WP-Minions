@@ -8,7 +8,13 @@
  * be used in it's place.
  */
 
-require_once __DIR__ . '/autoload.php';
+$wp_gears_autoloader_path = wp_gears_autoloader_file();
+
+if ( $wp_gears_autoloader_path ) {
+	require_once( $wp_gears_autoloader_path );
+} else {
+	return;
+}
 
 function wp_gears_runner() {
 	wp_gears_autoloader();
@@ -17,6 +23,19 @@ function wp_gears_runner() {
 	$plugin->enable();
 
 	return $plugin->run();
+}
+
+function wp_gears_autoloader_file() {
+	if ( file_exists( __DIR__ . '/autoload.php' ) ) {
+		return __DIR__ . '/autoload.php';
+	} else if ( file_exists( __DIR__ . '/wp-content/plugins/wp-gears/autoload.php' ) ) {
+		return __DIR__ . '/wp-content/plugins/wp-gears/autoload.php';
+	} else if ( defined( 'WP_GEARS_DIR' ) ) {
+		return WP_GEARS_DIR . '/autoload.php';
+	} else {
+		error_log( 'WP Gears Fatal Error - Cannot find autoload.php' );
+		return false;
+	}
 }
 
 if ( ! defined( 'PHPUNIT_RUNNER' ) ) {
