@@ -52,17 +52,27 @@ class Gearman_Async_Task extends WP_Async_Task {
 		$jobdata['hook'] = $hook;
 		$jobdata['args'] = $args;
 		$jobdata['blog_id'] = ( function_exists( 'is_multisite' ) && is_multisite() ) ? get_current_blog_id() : null;
+		$make_unique = isset( $jobdata['args']['make_unique'] );
+		if ( $make_unique ) {
+			unset( $jobdata['args']['make_unique'] );
+		}
 
 		switch( $priority ) {
 			case 'high':
-				return $this->_client->doHighBackground( $this->gearman_function(), json_encode( $jobdata ) );
+				return $make_unique
+					? $this->_client->doHighBackground( $this->gearman_function(), json_encode( $jobdata ), uniqid() )
+					: $this->_client->doHighBackground( $this->gearman_function(), json_encode( $jobdata ) );
 				break;
 			case 'low':
-				return $this->_client->doLowBackground( $this->gearman_function(), json_encode( $jobdata ) );
+				return $make_unique
+					? $this->_client->doLowBackground( $this->gearman_function(), json_encode( $jobdata ), uniqid() )
+					: $this->_client->doLowBackground( $this->gearman_function(), json_encode( $jobdata ) );
 				break;
 			case 'normal':
 			default:
-				return $this->_client->doBackground( $this->gearman_function(), json_encode( $jobdata ) );
+				return $make_unique
+					? $this->_client->doBackground( $this->gearman_function(), json_encode( $jobdata ) )
+					: $this->_client->doBackground( $this->gearman_function(), json_encode( $jobdata ), uniqid() );
 				break;
 		}
 	}
