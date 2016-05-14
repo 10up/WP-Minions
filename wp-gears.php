@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP Gears
  * Description: Integrates Gearman with WordPress
- * Version: 2.0
+ * Version: 2.0.1
  * Author: Chris Marslender, Darshan Sawardekar, 10up
  * Author URI: http://10up.com/
  * License: GPLv2 or later
