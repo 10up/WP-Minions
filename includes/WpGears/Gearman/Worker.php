@@ -36,14 +36,24 @@ class Worker extends BaseWorker {
 			$group    = $this->get_async_group();
 			$callable = array( $this, 'do_job' );
 
+			try {
+				if ( empty( $servers ) ) {
+					$worker->addServer();
+				} else {
+					$worker->addServers( implode( ',', $servers ) );
+				}
 
-			if ( empty( $servers ) ) {
-				$worker->addServer();
-			} else {
-				$worker->addServers( implode( ',', $servers ) );
+				return $worker->addFunction( $group, $callable );
+			} catch ( \GearmanException $e ) {
+				$servers = implode( ',', $servers );
+
+				if ( ! defined( 'PHPUNIT_RUNNER' ) ) {
+					error_log( "Fatal Gearman Error: Failed to register servers ($servers)" );
+					error_log( "  Cause: " . $e->getMessage() );
+				}
+
+				return false;
 			}
-
-			return $worker->addFunction( $group, $callable );
 		} else {
 			return false;
 		}

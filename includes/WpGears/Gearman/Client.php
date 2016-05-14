@@ -38,10 +38,21 @@ class Client extends BaseClient {
 		if ( $client !== false ) {
 			$servers = $this->get_servers();
 
-			if ( empty( $servers ) ) {
-				return $client->addServer();
-			} else {
-				return $client->addServers( implode( ',', $servers ) );
+			try {
+				if ( empty( $servers ) ) {
+					return $client->addServer();
+				} else {
+					return $client->addServers( implode( ',', $servers ) );
+				}
+			} catch ( \GearmanException $e ) {
+				$servers = implode( ',', $servers );
+
+				if ( ! defined( 'PHPUNIT_RUNNER' ) ) {
+					error_log( "Fatal Gearman Error: Failed to register servers ($servers)" );
+					error_log( "  Cause: " . $e->getMessage() );
+				}
+
+				return false;
 			}
 		} else {
 			return false;
