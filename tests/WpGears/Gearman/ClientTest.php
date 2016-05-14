@@ -47,6 +47,16 @@ class GearmanClientTest extends \WP_UnitTestCase {
 	}
 
 	function test_it_will_not_register_if_no_valid_gearman_client() {
+		$this->client->gearman_client = \Mockery::mock()
+			->shouldReceive( 'addServer' )
+			->andThrow( new \GearmanException( 'Failed to set exception option' ) )
+			->getMock();
+
+		$actual = $this->client->register();
+		$this->assertFalse( $actual );
+	}
+
+	function test_it_will_trap_gearman_error_if_failed_to_register_servers() {
 		$this->client->gearman_client = false;
 		$actual = $this->client->register();
 		$this->assertFalse( $actual );

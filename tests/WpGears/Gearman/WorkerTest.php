@@ -52,6 +52,16 @@ class GearmanWorkerTest extends \WP_UnitTestCase {
 		$this->assertFalse( $actual );
 	}
 
+	function test_it_will_not_register_if_failed_to_add_servers() {
+		$this->worker->gearman_worker = \Mockery::mock()
+			->shouldReceive( 'addServer' )
+			->andThrow( new \GearmanException( 'Failed to set exception option' ) )
+			->getMock();
+
+		$actual = $this->worker->register();
+		$this->assertFalse( $actual );
+	}
+
 	function test_it_will_add_default_server_to_worker_if_not_defined() {
 		$mock = \Mockery::mock()
 			->shouldReceive( 'addServer' )

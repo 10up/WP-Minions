@@ -13,3 +13,11 @@ tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
 require $_tests_dir . '/includes/bootstrap.php';
 
 define('PHPUNIT_RUNNER', true);
+
+if ( ! class_exists( '\GearmanException' ) ) {
+
+	class GearmanException extends \Exception {
+
+	}
+
+}
