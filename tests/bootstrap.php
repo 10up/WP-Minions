@@ -16,7 +16,7 @@ define('PHPUNIT_RUNNER', true);
 
 if ( ! class_exists( '\GearmanException' ) ) {
 
-	class GearmanExtension extends \Exception {
+	class GearmanException extends \Exception {
 
 	}
 
