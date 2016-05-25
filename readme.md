@@ -113,7 +113,7 @@ PARAMS="-q MySQL --mysql-host=localhost --mysql-port=3306 --mysql-user=<user> --
 
 Note: For some setups, the above will not work as ```/etc/default/gearman-job-server``` does not get read.  If you don't see the persistent queue setup then:
 
-1. Create a `gearman` db in mysql (the database must be present in the database, but when gearmand is initialized the first time it will create the table.
+1. Create a `gearman` db in mysql (the database must be present in the database, but when gearmand is initialized the first time it will create the table).
 2. Create a file in `/etc/gearmand.conf`
 3. In the file paste the configuration all on one line:
 
