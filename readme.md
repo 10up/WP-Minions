@@ -118,7 +118,7 @@ Note: For some setups, the above will not work as ```/etc/default/gearman-job-se
 3. In the file paste the configuration all on one line:
 
 ```sh
--q MySQL --mysql-host=localhost --mysql-port=3306 --mysql-user=root --mysql-password=root --mysql-db=gearman --mysql-table=gearman_queue
+-q MySQL --mysql-host=localhost --mysql-port=3306 --mysql-user=<user> --mysql-password=<password> --mysql-db=gearman --mysql-table=gearman_queue
 ```
 
 Then restart the gearman-job-server: ```sudo service gearman-job-server restart```.
