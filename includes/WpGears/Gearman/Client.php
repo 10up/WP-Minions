@@ -21,10 +21,6 @@ class Client extends BaseClient {
 	 */
 	public $gearman_servers;
 
-	/**
-	 * @var int The blog_id of the current multisite install.
-	 */
-	public $blog_id;
 
 	/**
 	 * Creates a new libGearman Client instances and configures the
@@ -180,15 +176,7 @@ class Client extends BaseClient {
 	 * @return int|false The current blog ids id.
 	 */
 	function get_blog_id() {
-		if ( is_null( $this->blog_id ) ) {
-			if ( function_exists( 'is_multisite' ) && is_multisite() ) {
-				$this->blog_id = get_current_blog_id();
-			} else {
-				$this->blog_id = false;
-			}
-		}
-
-		return $this->blog_id;
+		return function_exists( 'is_multisite' ) && is_multisite() ? get_current_blog_id() : false;
 	}
 
 }

@@ -107,6 +107,19 @@ class GearmanClientTest extends \WP_UnitTestCase {
 			//$this->markTestSkipped();
 		}
 	}
+	
+	
+	function test_it_uses_blog_id_from_current_site_on_switch() {
+		//create a new site and switch to it.
+		if ( function_exists( 'is_multisite' ) && is_multisite() ) {
+			$blog_id = $this->factory->blog->create();
+			switch_to_blog( $blog_id );
+			$actual = $this->client->get_blog_id();
+			$this->assertEquals( $blog_id, $actual );
+			restore_current_blog();
+		}
+		
+	}
 
 	function test_it_has_an_async_group() {
 		if ( defined( 'WP_ASYNC_TASK_SALT' ) ) {
