@@ -6,7 +6,13 @@
     "authors": [
         {
             "name": "Chris Marslender",
-            "email": "chrismarslender@gmail.com"
+            "email": "chrismarslender@gmail.com",
+            "homepage": "https://chrismarslender.com/",
+            "role": "Developer"
+        },
+        {
+            "name": "Darshan Sawardekar",
+            "role": "Developer"
         },
         {
             "name": "10up",
