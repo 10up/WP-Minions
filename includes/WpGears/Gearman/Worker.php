@@ -77,6 +77,8 @@ class Worker extends BaseWorker {
 			$result = false;
 		}
 
+		do_action( 'wp_async_after_worker_works', $result, $this );
+
 		return $result;
 	}
 
