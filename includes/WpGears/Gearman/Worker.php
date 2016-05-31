@@ -77,6 +77,8 @@ class Worker extends BaseWorker {
 			$result = false;
 		}
 
+		do_action( 'wp_async_task_after_work', $result, $this );
+
 		return $result;
 	}
 
@@ -126,13 +128,13 @@ class Worker extends BaseWorker {
 				$switched = false;
 			}
 
-			do_action( 'wp_async_task_before_job', $hook );
-			do_action( 'wp_async_task_before_job_' . $hook );
+			do_action( 'wp_async_task_before_job', $hook, $job );
+			do_action( 'wp_async_task_before_job_' . $hook, $job );
 
-			do_action( $hook, $args );
+			do_action( $hook, $args, $job );
 
-			do_action( 'wp_async_task_after_job', $hook );
-			do_action( 'wp_async_task_after_job_' . $hook );
+			do_action( 'wp_async_task_after_job', $hook, $job );
+			do_action( 'wp_async_task_after_job_' . $hook, $job );
 
 			$result = true;
 		} catch ( \Exception $e ) {

@@ -111,6 +111,19 @@ Edit the gearman config at ```/etc/default/gearman-job-server```, adding the fol
 PARAMS="-q MySQL --mysql-host=localhost --mysql-port=3306 --mysql-user=<user> --mysql-password=<password> --mysql-db=gearman --mysql-table=gearman_queue"
 ```
 
+Note: For some setups, the above will not work as ```/etc/default/gearman-job-server``` does not get read.  If you don't see the persistent queue setup then:
+
+1. Create a `gearman` db in mysql (the database must be present in the database, but when gearmand is initialized the first time it will create the table).
+2. Create a file in `/etc/gearmand.conf`
+3. In the file paste the configuration all on one line:
+
+```sh
+-q MySQL --mysql-host=localhost --mysql-port=3306 --mysql-user=<user> --mysql-password=<password> --mysql-db=gearman --mysql-table=gearman_queue
+```
+
+Then restart the gearman-job-server: ```sudo service gearman-job-server restart```.
+
+
 ## Verification
 
 Once everything is installed, you can quickly make sure gearman is accepting jobs with the ```test-client.php``` and ```test-worker.php``` files. The worker is configured to reverse any text passed to it. In the client file, we pass "Hello World" to the worker.
