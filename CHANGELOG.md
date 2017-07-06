@@ -5,7 +5,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 ## [3.0.0]
-- Renamed from WP Gears to WP Minions, to better reflect that this is designed to be used with any job queue backend - not just Gearman
+Renamed from WP Gears to WP Minions, to better reflect that this is designed to be used with any job queue backend - not just Gearman
+
+### Fixed
+- Ensure unit test suite is compatible with latest versions of PHP and WordPress
 
 ## [2.1.0]
 ### Added
