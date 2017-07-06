@@ -32,7 +32,7 @@ class GearmanWorkerTest extends \WP_UnitTestCase {
 			array( '192.168.1.10:5555' ), $actual
 		);
 
-		unset( $gearman_servers );
+		unset( $GLOBALS['gearman_servers'] );
 	}
 
 	function test_it_can_create_a_gearman_worker_if_configured() {
