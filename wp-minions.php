@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: WP Gears
- * Description: Integrates Gearman with WordPress
- * Version: 2.1.0
+ * Plugin Name: WP Minions
+ * Description: Job Queue for WordPress
+ * Version: 3.0.0
  * Author: Chris Marslender, Darshan Sawardekar, 10up
  * Author URI: http://10up.com/
  * License: GPLv2 or later
@@ -27,15 +27,15 @@ if ( ! defined( 'WP_ASYNC_TASK_SALT' ) ) {
  * @since 0.1
  */
 function wp_async_task_add( $hook, $args = array(), $priority = 'normal' ) {
-	$plugin = \WpGears\Plugin::get_instance();
+	$plugin = \WpMinions\Plugin::get_instance();
 
 	return $plugin->add( $hook, $args, $priority );
 }
 
 function wp_async_task_init() {
-	wp_gears_autoloader();
+	wp_minions_autoloader();
 
-	$plugin = \WpGears\Plugin::get_instance();
+	$plugin = \WpMinions\Plugin::get_instance();
 	$plugin->enable();
 
 	$GLOBALS['wp_async_task'] = $plugin;

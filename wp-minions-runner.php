@@ -1,6 +1,6 @@
 <?php
 /**
- * WpGears Runner
+ * WpMinions Runner
  *
  * IMPORTANT: This file must be placed in (or symlinked to) the root of the WordPress install!
  *
@@ -8,32 +8,32 @@
  * be used in it's place.
  */
 
-$wp_gears_autoloader_path = wp_gears_autoloader_file();
+$wp_minions_autoloader_path = wp_minions_autoloader_file();
 
-if ( $wp_gears_autoloader_path ) {
-	require_once( $wp_gears_autoloader_path );
+if ( $wp_minions_autoloader_path ) {
+	require_once( $wp_minions_autoloader_path );
 } else {
 	return;
 }
 
-function wp_gears_runner() {
-	wp_gears_autoloader();
+function wp_minions_runner() {
+	wp_minions_autoloader();
 
-	$plugin = \WpGears\Plugin::get_instance();
+	$plugin = \WpMinions\Plugin::get_instance();
 	$plugin->enable();
 
 	return $plugin->run();
 }
 
-function wp_gears_autoloader_file() {
+function wp_minions_autoloader_file() {
 	if ( file_exists( __DIR__ . '/autoload.php' ) ) {
 		return __DIR__ . '/autoload.php';
-	} else if ( file_exists( __DIR__ . '/wp-content/plugins/wp-gears/autoload.php' ) ) {
-		return __DIR__ . '/wp-content/plugins/wp-gears/autoload.php';
-	} else if ( defined( 'WP_GEARS_DIR' ) ) {
-		return WP_GEARS_DIR . '/autoload.php';
+	} else if ( file_exists( __DIR__ . '/wp-content/plugins/wp-minions/autoload.php' ) ) {
+		return __DIR__ . '/wp-content/plugins/wp-minions/autoload.php';
+	} else if ( defined( 'WP_MINIONS_DIR' ) ) {
+		return WP_MINIONS_DIR . '/autoload.php';
 	} else {
-		error_log( 'WP Gears Fatal Error - Cannot find autoload.php' );
+		error_log( 'WP Minions Fatal Error - Cannot find autoload.php' );
 		return false;
 	}
 }
@@ -51,12 +51,12 @@ if ( ! defined( 'PHPUNIT_RUNNER' ) ) {
 		/** Set up WordPress environment - using SCRIPT_FILENAME so that this file works even if its a symlink! */
 		if ( ! file_exists( dirname( $_SERVER["SCRIPT_FILENAME"] ) . '/wp-load.php' ) ) {
 			error_log(
-				'WP Gears Fatal Error - Cannot find wp-load.php'
+				'WP Minions Fatal Error - Cannot find wp-load.php'
 			);
 		}
 
 		require_once( dirname( $_SERVER["SCRIPT_FILENAME"] ) . '/wp-load.php' );
 	}
 
-	wp_gears_runner();
+	wp_minions_runner();
 }

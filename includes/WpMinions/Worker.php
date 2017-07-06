@@ -1,6 +1,6 @@
 <?php
 
-namespace WpGears;
+namespace WpMinions;
 
 /**
  * Workers are responsible for executing jobs. They may perform any

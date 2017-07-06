@@ -1,10 +1,10 @@
 {
-  "includes/WpGears/*.php": {
+  "includes/WpMinions/*.php": {
     "type": "plugin",
-    "test": "tests/WpGears/%sTest.php"
+    "test": "tests/WpMinions/%sTest.php"
   },
-  "tests/WpGears/*Test.php": {
+  "tests/WpMinions/*Test.php": {
     "type": "test",
-    "alternate": "includes/WpGears/%s.php"
+    "alternate": "includes/WpMinions/%s.php"
   }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace WpGears\Cron;
+namespace WpMinions\Cron;
 
 class CronWorkerTest extends \WP_UnitTestCase {
 

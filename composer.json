@@ -1,6 +1,6 @@
 {
-    "name": "10up/wp-gears",
-    "description": "Integrate Gearman with WordPress",
+    "name": "10up/wp-minions",
+    "description": "Job Queue for WordPress",
     "type": "wordpress-plugin",
     "license": "GPLv2",
     "authors": [
@@ -28,7 +28,7 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"WpGears\\": "includes/WpGears"
+			"WpMinions\\": "includes/WpMinions"
 		}
 	}
 }

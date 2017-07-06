@@ -1,7 +1,8 @@
-WP Gears [![Build Status](https://travis-ci.org/10up/WP-Gears.svg?branch=master)](https://travis-ci.org/10up/WP-Gears)
+WP Minions [![Build Status](https://travis-ci.org/10up/WP-Minions.svg?branch=master)](https://travis-ci.org/10up/WP-Minions)
 ========
 
-Integrate [Gearman](http://gearman.org/) with [WordPress](http://wordpress.org/) for asynchronous task running.
+Provides a framework for using Job Queues with [WordPress](http://wordpress.org/) for asynchronous task running.
+Provides an integration with [Gearman](http://gearman.org/) out of the box.
 
 <p align="center">
 <a href="http://10up.com/contact/"><img src="https://10updotcom-wpengine.s3.amazonaws.com/uploads/2016/10/10up-Github-Banner.png" width="850"></a>
@@ -10,9 +11,9 @@ Integrate [Gearman](http://gearman.org/) with [WordPress](http://wordpress.org/)
 
 As WordPress becomes a more popular publishing platform for increasingly large publishers, with complex workflows, the need for increasingly complex and resource-intensive tasks has only increased. Things like generating reports, expensive API calls, syncing users to mail providers, or even ingesting content from feeds all take a lot of time or a lot of memory (or both), and commonly can't finish within common limitations of web servers, because things like timeouts and memory limits get in the way.
 
-WP Gears provides a few helper functions that allow you to add tasks to a queue, and specify an action that should be called to trigger the task, just hook a callback into the action using ```add_action()```
+WP Minions provides a few helper functions that allow you to add tasks to a queue, and specify an action that should be called to trigger the task, just hook a callback into the action using ```add_action()```
 
-During configuration, a number of workers are specified. As workers are free, they will take the next task from the queue, call the action, and any callbacks hooked into the action will be run.
+During configuration, a number of minions (workers) are specified. As minions are free, they will take the next task from the queue, call the action, and any callbacks hooked into the action will be run.
 
 In the situation of needing more ram or higher timeouts, a separate server to process the tasks is ideal - Just set up WordPress on that server like the standard web servers, and up the resources. Make sure not to send any production traffic to the server, and it will exclusively handle tasks from the queue.
 
@@ -52,10 +53,10 @@ As you go through this, you may need to install additional packages, if you do n
 Filling in values in ```<brackets>``` as required, add the following config to either ```/etc/supervisord.conf``` (CentOS) or ```/etc/supervisor/supervisord.conf``` (Ubuntu)
 
 ```sh
-[program:my_wp_gears_workers]
-command=/usr/bin/php <path_to_wordpress>/wp-gears-runner.php
+[program:my_wp_minions_workers]
+command=/usr/bin/php <path_to_wordpress>/wp-minions-runner.php
 process_name=%(program_name)s-%(process_num)02d
-numprocs=<number_of_workers>
+numprocs=<number_of_minions>
 directory=<path_to_temp_directory>
 autostart=true
 autorestart=true
@@ -64,16 +65,16 @@ user=<user>
 ```
 
 * path_to_wordpress: Absolute path to the root of your WordPress install, ex: ```/var/www/html/wordpress```
-* number_of_workers: How many workers should be spawned (How many jobs can be running at once).
+* number_of_minions: How many minions should be spawned (How many jobs can be running at once).
 * path_to_temp_directory: probably should just be the same as path_to_wordpress.
 * user: The system user to run the processes under, probably apache, nginx, or www-data.
-* You can optionally change the "my_wp_gears_workers" text to something more descriptive, if you'd like.
+* You can optionally change the "my_wp_minions_workers" text to something more descriptive, if you'd like.
 
 #### Configuring WordPress
 
-* Install the plugin in WordPress. If desired, you can [download a zip](http://github.com/10up/WP-Gears/archive/master.zip) and install via the WordPress plugin installer.
+* Install the plugin in WordPress. If desired, you can [download a zip](http://github.com/10up/WP-Minions/archive/master.zip) and install via the WordPress plugin installer.
 
-* Create a symlink at the site root (the same directory as ```wp-settings.php```) that points to the ```wp-gears-runner.php``` file in the plugin (or copy the file, but a symlink will ensure it is updated if the plugin is updated)
+* Create a symlink at the site root (the same directory as ```wp-settings.php```) that points to the ```wp-minions-runner.php``` file in the plugin (or copy the file, but a symlink will ensure it is updated if the plugin is updated)
 
 
 * If your gearman service not running locally or uses a non-standard port, you'll need define your gearman servers in ```wp-config.php```
@@ -129,7 +130,7 @@ Then restart the gearman-job-server: ```sudo service gearman-job-server restart`
 
 ## Verification
 
-Once everything is installed, you can quickly make sure gearman is accepting jobs with the ```test-client.php``` and ```test-worker.php``` files. The worker is configured to reverse any text passed to it. In the client file, we pass "Hello World" to the worker.
+Once everything is installed, you can quickly make sure gearman is accepting jobs with the ```test-client.php``` and ```test-worker.php``` files located in the `system-tests/gearman` directory. The worker is configured to reverse any text passed to it. In the client file, we pass "Hello World" to the worker.
 
 In one window, run ```php test-worker.php``` - You'll now have one worker process running, waiting for jobs.
 
@@ -167,25 +168,25 @@ Once a worker is free, and runs the above task, you'd have an option called "my-
 
 ## Customization
 
-The following constants can be used to customize the behaviour of WP Gears.
+The following constants can be used to customize the behaviour of WP Minions.
 
-1. `WP_GEARS_JOBS_PER_WORKER` - The number of jobs to execute per Worker,
+1. `WP_MINIONS_JOBS_PER_WORKER` - The number of jobs to execute per Worker,
    default is 1. Running multiple jobs per worker will reduce the number
    workers spawned, and can significantly boost performance. However too
    large a value will cause issues if you have memory leaks. Use with
    caution.
 
-2. `WP_GEARS_CLIENT_CLASS` - You can also alter the Client class used to
+2. `WP_MINIONS_CLIENT_CLASS` - You can also alter the Client class used to
    send jobs to Gearman. It should match the interface of
-   `\WpGears\Client`.
+   `\WpMinions\Client`.
 
-3. `WP_GEARS_WORKER_CLASS` - Similarly you can alter the Worker class used
-   to execute jobs. It should match the interface of `\WpGears\Worker`.
+3. `WP_MINIONS_WORKER_CLASS` - Similarly you can alter the Worker class used
+   to execute jobs. It should match the interface of `\WpMinions\Worker`.
 
 ## Issues
 
-If you identify any errors or have an idea for improving the plugin, please [open an issue](https://github.com/10up/WP-Gears/issues). We're excited to see what the community thinks of this project, and we would love your input!
+If you identify any errors or have an idea for improving the plugin, please [open an issue](https://github.com/10up/WP-Minions/issues). We're excited to see what the community thinks of this project, and we would love your input!
 
 ## License
 
-WP Gears is free software; you can redistribute it and/or modify it under the terms of the [GNU General Public License](http://www.gnu.org/licenses/gpl-2.0.html) as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
+WP Minions is free software; you can redistribute it and/or modify it under the terms of the [GNU General Public License](http://www.gnu.org/licenses/gpl-2.0.html) as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.

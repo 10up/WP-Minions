@@ -1,6 +1,6 @@
 <?php
 
-namespace WpGears;
+namespace WpMinions;
 
 class PluginTest extends \WP_UnitTestCase {
 
@@ -52,7 +52,7 @@ class PluginTest extends \WP_UnitTestCase {
 	}
 
 	function test_it_will_use_a_custom_client_class_if_defined() {
-		$mock = \Mockery::mock( '\WpGears\Client' );
+		$mock = \Mockery::mock( '\WpMinions\Client' );
 		$this->plugin->config_prefix = 'B';
 		define( 'B_CLIENT_CLASS', get_class( $mock ) );
 
@@ -61,7 +61,7 @@ class PluginTest extends \WP_UnitTestCase {
 	}
 
 	function test_it_will_use_a_custom_worker_class_if_defined() {
-		$mock = \Mockery::mock( '\WpGears\Worker' );
+		$mock = \Mockery::mock( '\WpMinions\Worker' );
 		$this->plugin->config_prefix = 'C';
 		define( 'C_WORKER_CLASS', get_class( $mock ) );
 
@@ -75,7 +75,7 @@ class PluginTest extends \WP_UnitTestCase {
 			$actual = $this->plugin->build_client();
 
 			$this->assertInstanceOf(
-				'\WpGears\Gearman\Client', $actual
+				'\WpMinions\Gearman\Client', $actual
 			);
 		}
 	}
@@ -85,7 +85,7 @@ class PluginTest extends \WP_UnitTestCase {
 			$klass = '\GearmanWorker';
 			$actual = $this->plugin->build_worker();
 			$this->assertInstanceOf(
-				'\WpGears\Gearman\Worker', $actual
+				'\WpMinions\Gearman\Worker', $actual
 			);
 		}
 	}
@@ -94,7 +94,7 @@ class PluginTest extends \WP_UnitTestCase {
 		if ( ! class_exists( '\GearmanClient' ) ) {
 			$actual = $this->plugin->build_client();
 			$this->assertInstanceOf(
-				'\WpGears\Cron\Client', $actual
+				'\WpMinions\Cron\Client', $actual
 			);
 		}
 	}
@@ -103,7 +103,7 @@ class PluginTest extends \WP_UnitTestCase {
 		if ( ! class_exists( '\GearmanWorker' ) ) {
 			$actual = $this->plugin->build_worker();
 			$this->assertInstanceOf(
-				'\WpGears\Cron\Worker', $actual
+				'\WpMinions\Cron\Worker', $actual
 			);
 		}
 	}
@@ -170,11 +170,11 @@ class PluginTest extends \WP_UnitTestCase {
 		$this->plugin->enable();
 
 		$this->assertInstanceOf(
-			'\WpGears\Worker', $this->plugin->worker
+			'\WpMinions\Worker', $this->plugin->worker
 		);
 
 		$this->assertInstanceOf(
-			'\WpGears\Client', $this->plugin->client
+			'\WpMinions\Client', $this->plugin->client
 		);
 	}
 

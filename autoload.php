@@ -1,23 +1,23 @@
 <?php
 
-function wp_gears_autoloader() {
-	global $wp_gears_autoloaded;
+function wp_minions_autoloader() {
+	global $wp_minions_autoloaded;
 
-	if ( ! $wp_gears_autoloaded ) {
+	if ( ! $wp_minions_autoloaded ) {
 		$composer_autoloader = __DIR__ . '/vendor/autoload.php';
 
 		if ( file_exists( $composer_autoloader ) ) {
 			require_once( $composer_autoloader );
 		} else {
-			spl_autoload_register( 'wp_gears_autoload' );
+			spl_autoload_register( 'wp_minions_autoload' );
 		}
 
-		$wp_gears_autoloaded = true;
+		$wp_minions_autoloaded = true;
 	}
 }
 
-function wp_gears_autoload( $class_path ) {
-	if ( strpos( $class_path, 'WpGears\\' ) !== false ) {
+function wp_minions_autoload( $class_path ) {
+	if ( strpos( $class_path, 'WpMinions\\' ) !== false ) {
 		$class_file  = __DIR__ . '/includes/';
 		$class_file .= str_replace( '\\', '/', $class_path );
 		$class_file .= '.php';

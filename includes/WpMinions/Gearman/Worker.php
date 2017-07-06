@@ -1,8 +1,8 @@
 <?php
 
-namespace WpGears\Gearman;
+namespace WpMinions\Gearman;
 
-use WpGears\Worker as BaseWorker;
+use WpMinions\Worker as BaseWorker;
 
 /**
  * The Gearman Worker uses the libGearman API to execute Jobs in the
