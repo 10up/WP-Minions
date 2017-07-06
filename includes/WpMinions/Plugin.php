@@ -1,9 +1,9 @@
 <?php
 
-namespace WpGears;
+namespace WpMinions;
 
 /**
- * The main WpGears Plugin object. It creates a client and worker object
+ * The main WpMinions Plugin object. It creates a client and worker object
  * based the current configuration.
  *
  * When run in Client mode it will allow adding new jobs to the Queue.
@@ -33,21 +33,21 @@ class Plugin {
 	}
 
 	/**
-	 * @var \WpGears\Client The Client object used to enqueue jobs
+	 * @var \WpMinions\Client The Client object used to enqueue jobs
 	 */
 	public $client;
 
 	/**
-	 * @var \WpGears\Worker The Worker object used to execute jobs
+	 * @var \WpMinions\Worker The Worker object used to execute jobs
 	 */
 	public $worker;
 
 	/**
-	 * @var string Configuration constants are prefixed by WP_GEARS by default.
+	 * @var string Configuration constants are prefixed by WP_MINIONS by default.
 	 * ;w
-	 * Eg:- WP_GEARS_JOBS_PER_WORKER
+	 * Eg:- WP_MINIONS_JOBS_PER_WORKER
 	 */
-	public $config_prefix = 'WP_GEARS';
+	public $config_prefix = 'WP_MINIONS';
 
 	/**
 	 * @var int Number of jobs to execute per worker, Default 1
@@ -105,7 +105,7 @@ class Plugin {
 
 	/**
 	 * Executes jobs on the current Worker. A Worker will taken up
-	 * only one job by default. If WP_GEARS_JOBS_PER_WORKER is defined
+	 * only one job by default. If WP_MINIONS_JOBS_PER_WORKER is defined
 	 * that many jobs will be executed before it exits.
 	 *
 	 * This method will exit with the result code based on
@@ -142,7 +142,7 @@ class Plugin {
 	 * Returns the Client object used to add jobs. Creates the instance
 	 * of the client lazily.
 	 *
-	 * @return \WpGears\Client The client instance
+	 * @return \WpMinions\Client The client instance
 	 */
 	function get_client() {
 		if ( is_null( $this->client ) ) {
@@ -156,7 +156,7 @@ class Plugin {
 	 * Returns the Worker object used to execute jobs. Creates the instance
 	 * of the worker lazily.
 	 *
-	 * @param \WpGears\Worker The worker instance
+	 * @param \WpMinions\Worker The worker instance
 	 */
 	function get_worker() {
 		if ( is_null( $this->worker ) ) {
@@ -168,20 +168,20 @@ class Plugin {
 
 	/**
 	 * Conditionally builds a new Client object. If the constant
-	 * WP_GEARS_CLIENT_CLASS is defined it will return an instance of that
+	 * WP_MINIONS_CLIENT_CLASS is defined it will return an instance of that
 	 * class.
 	 *
 	 * By default it will detect if Gearman is present and return the
 	 * Gearman Client else fallback to the Cron Client.
 	 *
-	 * @return \WpGears\Client New instance of the Client
+	 * @return \WpMinions\Client New instance of the Client
 	 */
 	function build_client() {
 		if ( ! $this->has_config( 'CLIENT_CLASS' ) ) {
 			if ( class_exists( '\GearmanClient' ) ) {
-				return new \WpGears\Gearman\Client();
+				return new \WpMinions\Gearman\Client();
 			} else {
-				return new \WpGears\Cron\Client();
+				return new \WpMinions\Cron\Client();
 			}
 		} else {
 			$klass = $this->get_config( 'CLIENT_CLASS' );
@@ -191,20 +191,20 @@ class Plugin {
 
 	/**
 	 * Conditionally builds a new Worker object. If the constant
-	 * WP_GEARS_WORKER_CLASS is defined it will return an instance of
+	 * WP_MINIONS_WORKER_CLASS is defined it will return an instance of
 	 * that class.
 	 *
 	 * By default it will detect if Gearman is present and return the
 	 * Gearman Worker else fallback to the Cron Worker.
 	 *
-	 * @return \WpGears\Worker New instance of the Worker
+	 * @return \WpMinions\Worker New instance of the Worker
 	 */
 	function build_worker() {
 		if ( ! $this->has_config( 'WORKER_CLASS' ) ) {
 			if ( class_exists( '\GearmanWorker' ) ) {
-				return new \WpGears\Gearman\Worker();
+				return new \WpMinions\Gearman\Worker();
 			} else {
-				return new \WpGears\Cron\Worker();
+				return new \WpMinions\Cron\Worker();
 			}
 		} else {
 			$klass = $this->get_config( 'WORKER_CLASS' );
@@ -242,7 +242,7 @@ class Plugin {
 	 *
 	 * @param string $constant Name of constant to lookup
 	 * @param string $default Optional default
-	 * @param string $config_prefix Optional config prefix, Default is WP_GEARS
+	 * @param string $config_prefix Optional config prefix, Default is WP_MINIONS
 	 * @return mixed The value of the config
 	 */
 	function get_config( $constant, $default = '', $config_prefix = '' ) {
@@ -315,7 +315,7 @@ class Plugin {
 			require_once( $wp_load );
 		} else {
 			error_log(
-				"WP Gears Fatal Error - Cannot find wp-load.php( $wp_load )"
+				"WP Minions Fatal Error - Cannot find wp-load.php( $wp_load )"
 			);
 
 			return $this->quit( 1 );

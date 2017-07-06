@@ -1,8 +1,8 @@
 <?php
 
-namespace WpGears\Gearman;
+namespace WpMinions\Gearman;
 
-use WpGears\Client as BaseClient;
+use WpMinions\Client as BaseClient;
 
 /**
  * The Gearman Client uses the libGearman API to add jobs to the Gearman

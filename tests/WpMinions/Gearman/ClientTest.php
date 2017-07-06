@@ -1,6 +1,6 @@
 <?php
 
-namespace WpGears\Gearman;
+namespace WpMinions\Gearman;
 
 class GearmanClientTest extends \WP_UnitTestCase {
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace WpGears\Cron;
+namespace WpMinions\Cron;
 
-use WpGears\Client as BaseClient;
+use WpMinions\Client as BaseClient;
 
 /**
  * The Cron Client uses WPCron to add jobs. This is the fallback used if

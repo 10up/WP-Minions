@@ -1,9 +1,9 @@
 <?php
 
-namespace WpGears;
+namespace WpMinions;
 
 /**
- * Base class for all WpGears Clients. A Client is responsible for
+ * Base class for all WpMinions Clients. A Client is responsible for
  * adding jobs to it's Queue. It may optionally perform additional
  * initialization to setup it's initial state.
  */

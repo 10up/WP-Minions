@@ -1,11 +1,11 @@
 <?php
 
-class WpGearsTest extends \WP_UnitTestCase {
+class WpMinionsTest extends \WP_UnitTestCase {
 
 	function setUp() {
 		parent::setUp();
 
-		require_once( __DIR__ . '/../wp-gears.php' );
+		require_once( __DIR__ . '/../wp-minions.php' );
 	}
 
 	function tearDown() {
@@ -13,13 +13,13 @@ class WpGearsTest extends \WP_UnitTestCase {
 	}
 
 	function test_it_has_a_custom_autoloader() {
-		$this->assertTrue( function_exists( 'wp_gears_autoload' ) );
+		$this->assertTrue( function_exists( 'wp_minions_autoload' ) );
 	}
 
 	function test_it_can_initialize_the_plugin() {
 		wp_async_task_init();
 
-		$plugin = \WpGears\Plugin::get_instance();
+		$plugin = \WpMinions\Plugin::get_instance();
 		$this->assertTrue( $plugin->did_enable );
 	}
 
@@ -36,7 +36,7 @@ class WpGearsTest extends \WP_UnitTestCase {
 			->andReturn( true )
 			->getMock();
 
-		$plugin = \WpGears\Plugin::get_instance();
+		$plugin = \WpMinions\Plugin::get_instance();
 		$plugin->config_prefix = 'C' . uniqid();
 		$plugin->client = $mock;
 

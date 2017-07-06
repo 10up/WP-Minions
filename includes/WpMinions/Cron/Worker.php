@@ -1,8 +1,8 @@
 <?php
 
-namespace WpGears\Cron;
+namespace WpMinions\Cron;
 
-use WpGears\Worker as BaseWorker;
+use WpMinions\Worker as BaseWorker;
 
 /**
  * The WP-Cron implementation does not have a concept of Workers. We

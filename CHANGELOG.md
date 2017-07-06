@@ -4,6 +4,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [3.0.0]
+- Renamed from WP Gears to WP Minions, to better reflect that this is designed to be used with any job queue backend - not just Gearman
+
 ## [2.1.0]
 ### Added
 - `wp_async_task_after_work` action after the gearman worker finishes working
