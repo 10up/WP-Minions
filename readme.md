@@ -7,6 +7,7 @@ Provides an integration with [Gearman](http://gearman.org/) out of the box.
 <p align="center">
 <a href="http://10up.com/contact/"><img src="https://10updotcom-wpengine.s3.amazonaws.com/uploads/2016/10/10up-Github-Banner.png" width="850"></a>
 </p>
+
 ## Background & Purpose
 
 As WordPress becomes a more popular publishing platform for increasingly large publishers, with complex workflows, the need for increasingly complex and resource-intensive tasks has only increased. Things like generating reports, expensive API calls, syncing users to mail providers, or even ingesting content from feeds all take a lot of time or a lot of memory (or both), and commonly can't finish within common limitations of web servers, because things like timeouts and memory limits get in the way.
