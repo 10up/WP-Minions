@@ -20,11 +20,11 @@ In the situation of needing more ram or higher timeouts, a separate server to pr
 
 ## Installation
 
-* Install the plugin in WordPress. If desired, you can [download a zip](http://github.com/10up/WP-Minions/archive/master.zip) and install via the WordPress plugin installer.
+1. Install the plugin in WordPress. If desired, you can [download a zip](http://github.com/10up/WP-Minions/archive/master.zip) and install via the WordPress plugin installer.
 
-* Create a symlink at the site root (the same directory as ```wp-settings.php```) that points to the ```wp-minions-runner.php``` file in the plugin (or copy the file, but a symlink will ensure it is updated if the plugin is updated)
+2. Create a symlink at the site root (the same directory as ```wp-settings.php```) that points to the ```wp-minions-runner.php``` file in the plugin (or copy the file, but a symlink will ensure it is updated if the plugin is updated)
 
-* Define a unique salt in `wp-config.php` so that multiple installs don't conflict.
+3. Define a unique salt in `wp-config.php` so that multiple installs don't conflict.
 ```php
 define( 'WP_ASYNC_TASK_SALT', 'my-unique-salt-1' );
 ```
@@ -36,7 +36,7 @@ if ( ! isset( $_SERVER['HTTP_HOST'] ) && defined( 'DOING_ASYNC' ) && DOING_ASYNC
 }
 ```
 
-Next, you'll need to choose your job queue system. Gearman and RabbitMQ are supported out of the box.
+4. Next, you'll need to choose your job queue system. Gearman and RabbitMQ are supported out of the box.
 
 ### Gearman
 
@@ -181,7 +181,7 @@ The following constants can be used to customize the behaviour of WP Minions.
    caution.
 
 2. `WP_MINIONS_CLIENT_CLASS` - You can also alter the Client class used to
-   send jobs to Gearman. It should match the interface of
+   send jobs to your job queue. It should match the interface of
    `\WpMinions\Client`.
 
 3. `WP_MINIONS_WORKER_CLASS` - Similarly you can alter the Worker class used
