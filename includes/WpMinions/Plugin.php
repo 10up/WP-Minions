@@ -60,6 +60,9 @@ class Plugin {
 	/** @var Custom client class */
 	public $client_class;
 
+	/** @var string Job queue backend */
+	public $backend;
+
 	/*
 	 * @var bool Indicates if the plugin executed a job.
 	 *
@@ -167,19 +170,26 @@ class Plugin {
 	}
 
 	/**
-	 * Conditionally builds a new Client object. If the constant
-	 * WP_MINIONS_CLIENT_CLASS is defined it will return an instance of that
-	 * class.
+	 * Conditionally builds a new Client object.
 	 *
-	 * By default it will detect if Gearman is present and return the
-	 * Gearman Client else fallback to the Cron Client.
+	 * If the constant WP_MINIONS_CLIENT_CLASS is defined, it will return an instance of
+	 * that class. If not, WP_MINIONS_BACKEND is checked to chose the client class. If not,
+	 * default to cron client.
 	 *
 	 * @return \WpMinions\Client New instance of the Client
 	 */
 	function build_client() {
 		if ( ! $this->has_config( 'CLIENT_CLASS' ) ) {
-			if ( class_exists( '\GearmanClient' ) ) {
-				return new \WpMinions\Gearman\Client();
+			if ( $this->has_config( 'BACKEND' ) ) {
+				$backend = $this->get_config( 'BACKEND' );
+
+				if ( 'gearman' === strtolower( $backend ) ) {
+					return new \WpMinions\Gearman\Client();
+				} elseif ( 'rabbitmq' === strtolower( $backend ) ) {
+					return new \WpMinions\RabbitMQ\Client();
+				} else {
+					return new \WpMinions\Cron\Client();
+				}
 			} else {
 				return new \WpMinions\Cron\Client();
 			}
@@ -190,19 +200,26 @@ class Plugin {
 	}
 
 	/**
-	 * Conditionally builds a new Worker object. If the constant
-	 * WP_MINIONS_WORKER_CLASS is defined it will return an instance of
-	 * that class.
+	 * Conditionally builds a new Worker object.
 	 *
-	 * By default it will detect if Gearman is present and return the
-	 * Gearman Worker else fallback to the Cron Worker.
+	 * If the constant WP_MINIONS_WORKER_CLASS is defined it will return an instance of
+	 * that class. If not, WP_MINIONS_BACKEND is checked to chose the worker class. If not,
+	 * default to cron.
 	 *
 	 * @return \WpMinions\Worker New instance of the Worker
 	 */
 	function build_worker() {
 		if ( ! $this->has_config( 'WORKER_CLASS' ) ) {
-			if ( class_exists( '\GearmanWorker' ) ) {
-				return new \WpMinions\Gearman\Worker();
+			if ( $this->has_config( 'BACKEND' ) ) {
+				$backend = $this->get_config( 'BACKEND' );
+
+				if ( 'gearman' === strtolower( $backend ) ) {
+					return new \WpMinions\Gearman\Worker();
+				} elseif ( 'rabbitmq' === strtolower( $backend ) ) {
+					return new \WpMinions\RabbitMQ\Worker();
+				} else {
+					return new \WpMinions\Cron\Worker();
+				}
 			} else {
 				return new \WpMinions\Cron\Worker();
 			}

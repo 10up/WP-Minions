@@ -1,8 +1,8 @@
 WP Minions [![Build Status](https://travis-ci.org/10up/WP-Minions.svg?branch=master)](https://travis-ci.org/10up/WP-Minions)
 ========
 
-Provides a framework for using Job Queues with [WordPress](http://wordpress.org/) for asynchronous task running.
-Provides an integration with [Gearman](http://gearman.org/) out of the box.
+Provides a framework for using job queues with [WordPress](http://wordpress.org/) for asynchronous task running.
+Provides an integration with [Gearman](http://gearman.org/) and [RabbitMQ](https://www.rabbitmq.com) out of the box.
 
 <p align="center">
 <a href="http://10up.com/contact/"><img src="https://10updotcom-wpengine.s3.amazonaws.com/uploads/2016/10/10up-Github-Banner.png" width="850"></a>
@@ -19,6 +19,26 @@ During configuration, a number of minions (workers) are specified. As minions ar
 In the situation of needing more ram or higher timeouts, a separate server to process the tasks is ideal - Just set up WordPress on that server like the standard web servers, and up the resources. Make sure not to send any production traffic to the server, and it will exclusively handle tasks from the queue.
 
 ## Installation
+
+1. Install the plugin in WordPress. If desired, you can [download a zip](http://github.com/10up/WP-Minions/archive/master.zip) and install via the WordPress plugin installer.
+
+2. Create a symlink at the site root (the same directory as ```wp-settings.php```) that points to the ```wp-minions-runner.php``` file in the plugin (or copy the file, but a symlink will ensure it is updated if the plugin is updated)
+
+3. Define a unique salt in `wp-config.php` so that multiple installs don't conflict.
+```php
+define( 'WP_ASYNC_TASK_SALT', 'my-unique-salt-1' );
+```
+
+**Note:** If you are using multisite, you'll also have to add the following to your ```wp-config.php``` file, _after_ the block with the multisite definitions. This is due to the fact that multisite relies on ```HTTP_HOST``` to detect the site/blog it is running under. You'll also want to make sure you are actually defining ```DOMAIN_CURRENT_SITE``` in the multisite configuration.
+```php
+if ( ! isset( $_SERVER['HTTP_HOST'] ) && defined( 'DOING_ASYNC' ) && DOING_ASYNC ) {
+  $_SERVER['HTTP_HOST'] = DOMAIN_CURRENT_SITE;
+}
+```
+
+4. Next, you'll need to choose your job queue system. Gearman and RabbitMQ are supported out of the box.
+
+### Gearman
 
 There are a few parts to get this all running. First, the Gearman backend needs to be setup - this part will vary depending on your OS. Once that is complete, we can install the WordPress plugin, and set the configuration options for WordPress.
 
@@ -71,31 +91,14 @@ user=<user>
 * user: The system user to run the processes under, probably apache, nginx, or www-data.
 * You can optionally change the "my_wp_minions_workers" text to something more descriptive, if you'd like.
 
-#### Configuring WordPress
+#### WordPress Configuration
 
-* Install the plugin in WordPress. If desired, you can [download a zip](http://github.com/10up/WP-Minions/archive/master.zip) and install via the WordPress plugin installer.
-
-* Create a symlink at the site root (the same directory as ```wp-settings.php```) that points to the ```wp-minions-runner.php``` file in the plugin (or copy the file, but a symlink will ensure it is updated if the plugin is updated)
-
-
-* If your gearman service not running locally or uses a non-standard port, you'll need define your gearman servers in ```wp-config.php```
+If your gearman service not running locally or uses a non-standard port, you'll need define your gearman servers in ```wp-config.php```
 ```php
 global $gearman_servers;
 $gearman_servers = array(
-	'127.0.0.1:4730',
+  '127.0.0.1:4730',
 );
-```
-
-* Define a unique salt in `wp-config.php` so that multiple installs don't conflict.
-```php
-define( 'WP_ASYNC_TASK_SALT', 'my-unique-salt-1' );
-```
-
-**Note:** If you are using multisite, you'll also have to add the following to your ```wp-config.php``` file, _after_ the block with the multisite definitions. This is due to the fact that multisite relies on ```HTTP_HOST``` to detect the site/blog it is running under. You'll also want to make sure you are actually defining ```DOMAIN_CURRENT_SITE``` in the multisite configuration.
-```php
-if ( ! isset( $_SERVER['HTTP_HOST'] ) && defined( 'DOING_ASYNC' ) && DOING_ASYNC ) {
-	$_SERVER['HTTP_HOST'] = DOMAIN_CURRENT_SITE;
-}
 ```
 
 ## MySQL Persistent Queue (Recommended)
@@ -131,7 +134,7 @@ Then restart the gearman-job-server: ```sudo service gearman-job-server restart`
 
 ## Verification
 
-Once everything is installed, you can quickly make sure gearman is accepting jobs with the ```test-client.php``` and ```test-worker.php``` files located in the `system-tests/gearman` directory. The worker is configured to reverse any text passed to it. In the client file, we pass "Hello World" to the worker.
+Once everything is installed, you can quickly make sure your job queue is accepting jobs with the ```test-client.php``` and ```test-worker.php``` files located in the `system-tests/YOURQUEUE` directory. The worker is configured to reverse any text passed to it. In the client file, we pass "Hello World" to the worker.
 
 In one window, run ```php test-worker.php``` - You'll now have one worker process running, waiting for jobs.
 
@@ -178,7 +181,7 @@ The following constants can be used to customize the behaviour of WP Minions.
    caution.
 
 2. `WP_MINIONS_CLIENT_CLASS` - You can also alter the Client class used to
-   send jobs to Gearman. It should match the interface of
+   send jobs to your job queue. It should match the interface of
    `\WpMinions\Client`.
 
 3. `WP_MINIONS_WORKER_CLASS` - Similarly you can alter the Worker class used
