@@ -34,7 +34,11 @@ class Client extends BaseClient {
 			return $this->connection;
 		}
 
-		$this->connection = new Connection();
+		try {
+			$this->connection = new Connection();
+		} catch ( \Exception $e ) {
+			return false;
+		}
 
 		return $this->connection;
 	}
@@ -59,11 +63,7 @@ class Client extends BaseClient {
 		);
 
 		$message = new \PhpAmqpLib\Message\AMQPMessage(
-			$job_data,
-			array(
-				'delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT
-			)
-		);
+			json_encode( $job_data ) );
 
 		$this->connection->get_channel()->basic_publish( $message, '', 'wordpress' );
 	}

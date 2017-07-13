@@ -26,7 +26,11 @@ class Worker extends BaseWorker {
 			return $this->connection;
 		}
 
-		$this->connection = new Connection();
+		try {
+			$this->connection = new Connection();
+		} catch ( \Exception $e ) {
+			return false;
+		}
 
 		return $this->connection;
 	}
@@ -40,12 +44,48 @@ class Worker extends BaseWorker {
 			return false;
 		}
 
-		$channel->basic_consume( 'wordpress', '', false, true, false, false, function( $message ) {
-			do_action( $message['hook'], $message['args'] );
+		$this->connection->get_channel()->basic_consume( 'wordpress', '', false, true, false, false, function( $message ) {
+			try {
+				$job_data = json_decode( $message->body, true );
+				$hook     = $job_data['hook'];
+				$args     = $job_data['args'];
+
+				if ( function_exists( 'is_multisite' ) && is_multisite() && $job_data['blog_id'] ) {
+					$blog_id = $job_data['blog_id'];
+
+					if ( get_current_blog_id() !== $blog_id ) {
+						switch_to_blog( $blog_id );
+						$switched = true;
+					} else {
+						$switched = false;
+					}
+				} else {
+					$switched = false;
+				}
+
+				do_action( 'wp_async_task_before_job', $hook, $message );
+				do_action( 'wp_async_task_before_job_' . $hook, $message );
+
+				do_action( $hook, $args, $message );
+
+				do_action( 'wp_async_task_after_job', $hook, $message );
+				do_action( 'wp_async_task_after_job_' . $hook, $message );
+
+				$result = true;
+			} catch ( \Exception $e ) {
+				error_log(
+					'RabbitMQWorker->do_job failed: ' . $e->getMessage()
+				);
+				$result = false;
+			}
+
+			if ( $switched ) {
+				restore_current_blog();
+			}
 		} );
 
-		while(count($channel->callbacks)) {
-			$channel->wait();
+		while ( count( $this->connection->get_channel()->callbacks ) ) {
+			$this->connection->get_channel()->wait();
 		}
 	}
 }

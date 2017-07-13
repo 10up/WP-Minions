@@ -14,9 +14,6 @@ class Connection {
 	public function __construct() {
 		global $rabbitmq_server;
 
-		$this->connection = false;
-		$this->channel = false;
-
 		if ( class_exists( '\PhpAmqpLib\Connection\AMQPStreamConnection' ) ) {
 			if ( empty( $rabbitmq_server ) ) {
 				$rabbitmq_server = array();
@@ -29,20 +26,15 @@ class Connection {
 				'password' => 'guest',
 			) );
 
-			try {
-				$this->connection = new \PhpAmqpLib\Connection\AMQPStreamConnection( $rabbitmq_server['host'], $rabbitmq_server['port'], $rabbitmq_server['username'], $rabbitmq_server['password'] );
-				$this->channel = $this->connection->channel();
+			$this->connection = new \PhpAmqpLib\Connection\AMQPStreamConnection( $rabbitmq_server['host'], $rabbitmq_server['port'], $rabbitmq_server['username'], $rabbitmq_server['password'] );
+			$this->channel = $this->connection->channel();
 
-				$this->channel->queue_declare( 'wordpress', false, true, false, false );
+			$this->channel->queue_declare( 'wordpress', false, true, false, false );
 
-				add_action( 'shutdown', array( $this, 'shutdown' ) );
-			} catch ( \Exception $e ) {
-				$this->connection = false;
-				$this->channel = false;
-			}
+			add_action( 'shutdown', array( $this, 'shutdown' ) );
+		} else {
+			throw new \Exception( 'Could not create connection.' );
 		}
-
-		return $this->connection;
 	}
 
 	/**
@@ -59,7 +51,7 @@ class Connection {
 	 */
 	public function shutdown() {
 		if ( empty( $this->connection ) || empty( $this->channel ) ) {
-			return false;
+			return;
 		}
 
 		$this->channel->close();
