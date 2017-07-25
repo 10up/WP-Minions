@@ -93,6 +93,11 @@ user=<user>
 
 #### WordPress Configuration
 
+Define the `WP_MINIONS_BACKEND` constant in your ```wp-config.php```.  Valid values are `gearman` or `rabbitmq`.  If left blank, it will default to a cron client.
+```
+define( 'WP_MINIONS_BACKEND', 'gearman' );
+```
+
 If your gearman service not running locally or uses a non-standard port, you'll need define your gearman servers in ```wp-config.php```
 ```php
 global $gearman_servers;
