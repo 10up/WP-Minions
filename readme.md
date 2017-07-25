@@ -91,8 +91,11 @@ user=<user>
 * user: The system user to run the processes under, probably apache, nginx, or www-data.
 * You can optionally change the "my_wp_minions_workers" text to something more descriptive, if you'd like.
 
-After updating the supervisor configuration, restart the service.
+After updating the supervisor configuration, restart the service (CentOS or Ubuntu)
 
+```
+systemctl restart supervisord
+```
 ```
 service supervisor restart
 ```
