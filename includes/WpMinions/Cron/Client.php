@@ -33,7 +33,7 @@ class Client extends BaseClient {
 		$job_data = array(
 			'hook'    => $hook,
 			'args'    => $args,
-			'blog_id' => $this->get_blog_id(),
+			'blog_id' => get_current_blog_id(),
 		);
 
 		$job_data = apply_filters( 'wp_async_task_add_job_data', $job_data );
