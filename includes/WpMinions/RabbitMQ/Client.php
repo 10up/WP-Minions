@@ -62,8 +62,10 @@ class Client extends BaseClient {
 			'blog_id' => get_current_blog_id(),
 		);
 
+		$job_data = apply_filters( 'wp_async_task_add_job_data', $job_data );
+
 		$message = new \PhpAmqpLib\Message\AMQPMessage(
-			json_encode( $job_data ) );
+		json_encode( $job_data ) );
 
 		$this->connection->get_channel()->basic_publish( $message, '', 'wordpress' );
 	}

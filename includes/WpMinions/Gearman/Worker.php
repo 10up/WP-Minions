@@ -49,7 +49,7 @@ class Worker extends BaseWorker {
 
 				if ( ! defined( 'PHPUNIT_RUNNER' ) ) {
 					error_log( "Fatal Gearman Error: Failed to register servers ($servers)" );
-					error_log( "  Cause: " . $e->getMessage() );
+					error_log( '  Cause: ' . $e->getMessage() );
 				}
 
 				return false;
