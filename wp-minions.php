@@ -49,8 +49,10 @@ add_action( 'plugins_loaded', function() {
 	}
 });
 
-// Init
-if ( ! defined( 'PHPUNIT_RUNNER' ) ) {
-	wp_async_task_init();
-}
+add_action( 'plugins_loaded', function() {
+	// Init
+	if ( ! defined( 'PHPUNIT_RUNNER' ) ) {
+		wp_async_task_init();
+	}
+}, 9 );
 
