@@ -182,21 +182,22 @@ class Plugin {
 		if ( ! $this->has_config( 'CLIENT_CLASS' ) ) {
 			if ( $this->has_config( 'BACKEND' ) ) {
 				$backend = $this->get_config( 'BACKEND' );
-
-				if ( 'gearman' === strtolower( $backend ) ) {
-					return new \WpMinions\Gearman\Client();
-				} elseif ( 'rabbitmq' === strtolower( $backend ) ) {
-					return new \WpMinions\RabbitMQ\Client();
-				} else {
-					return new \WpMinions\Cron\Client();
+				if ( ! is_wp_error( $backend ) ) {
+					if ( 'gearman' === strtolower( $backend ) ) {
+						return new \WpMinions\Gearman\Client();
+					} elseif ( 'rabbitmq' === strtolower( $backend ) ) {
+						return new \WpMinions\RabbitMQ\Client();
+					}
 				}
-			} else {
-				return new \WpMinions\Cron\Client();
 			}
 		} else {
 			$klass = $this->get_config( 'CLIENT_CLASS' );
-			return new $klass();
+			if ( ! is_wp_error( $klass ) && class_exists( $klass ) ) {
+				return new $klass();
+			}
 		}
+
+		return new \WpMinions\Cron\Client();
 	}
 
 	/**
@@ -212,21 +213,22 @@ class Plugin {
 		if ( ! $this->has_config( 'WORKER_CLASS' ) ) {
 			if ( $this->has_config( 'BACKEND' ) ) {
 				$backend = $this->get_config( 'BACKEND' );
-
-				if ( 'gearman' === strtolower( $backend ) ) {
-					return new \WpMinions\Gearman\Worker();
-				} elseif ( 'rabbitmq' === strtolower( $backend ) ) {
-					return new \WpMinions\RabbitMQ\Worker();
-				} else {
-					return new \WpMinions\Cron\Worker();
+				if ( ! is_wp_error( $backend ) ) {
+					if ( 'gearman' === strtolower( $backend ) ) {
+						return new \WpMinions\Gearman\Worker();
+					} elseif ( 'rabbitmq' === strtolower( $backend ) ) {
+						return new \WpMinions\RabbitMQ\Worker();
+					}
 				}
-			} else {
-				return new \WpMinions\Cron\Worker();
 			}
 		} else {
 			$klass = $this->get_config( 'WORKER_CLASS' );
-			return new $klass();
+			if ( ! is_wp_error( $klass ) && class_exists( $klass ) ) {
+				return new $klass();
+			}
 		}
+
+		return new \WpMinions\Cron\Worker();
 	}
 
 	/**
@@ -235,9 +237,12 @@ class Plugin {
 	 * @return int Defaults to 1
 	 */
 	function get_jobs_per_worker() {
-		return $this->get_config(
-			'JOBS_PER_WORKER', 1
-		);
+		$jobs = $this->get_config( 'JOBS_PER_WORKER', 1 );
+		if ( is_wp_error( $jobs ) ) {
+			$jobs = 1;
+		}
+
+		return $jobs;
 	}
 
 	/**
@@ -278,8 +283,9 @@ class Plugin {
 
 			return $this->$variable;
 		} else {
-			throw new \Exception(
-				"Fatal Error - Public Var($variable) not declared"
+			return new \WP_Error(
+				'wpminions-config-no-var',
+				"Fatal Error - Public Var({$variable}) not declared"
 			);
 		}
 	}
@@ -293,7 +299,7 @@ class Plugin {
 	 */
 	function has_config( $constant ) {
 		$value = $this->get_config( $constant );
-		return ! empty( $value );
+		return ! empty( $value ) && ! is_wp_error( $value );
 	}
 
 	/**
