@@ -45,9 +45,9 @@ There are a few parts to get this all running. First, the Gearman backend needs 
 #### Backend Setup - CentOS 6.x
 
 1. You'll need the [EPEL](https://fedoraproject.org/wiki/EPEL) repo for gearman, and the [REMI](http://rpms.famillecollet.com/) repo for some of the php packages. Make sure to enable the appropriate remi repo for the version of php you are using.
-  - ```wget http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm && rpm -Uvh epel-release-6*.rpm```
-  - ```wget http://rpms.famillecollet.com/enterprise/remi-release-6.rpm && rpm -Uvh remi-release-6*.rpm```
-  - ```rm *.rpm```
+    - ```wget http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm && rpm -Uvh epel-release-6*.rpm```
+    - ```wget http://rpms.famillecollet.com/enterprise/remi-release-6.rpm && rpm -Uvh remi-release-6*.rpm```
+    - ```rm *.rpm```
 1. Make sure that remi is enabled, as well as any specific version of php you may want in ```/etc/yum.repos.d/remi.repo```
 1. ```yum install gearmand php-pecl-gearman python-pip```
 1. ```easy_install supervisor```
@@ -55,6 +55,20 @@ There are a few parts to get this all running. First, the Gearman backend needs 
 1. If everything is running on one server, I would recommend limiting connections to localhost only. If not, you'll want to set up firewall rules to only allow certain clients to connect on the Gearman port (Default 4730)
   - edit ```/etc/sysconfig/gearmand``` - set ```OPTIONS="--listen=localhost"```
 1. ```service gearmand start```
+
+#### Backend Setup - CentOS 7.x
+
+1. You'll need the [EPEL](https://fedoraproject.org/wiki/EPEL) repo for gearman, and the [REMI](http://rpms.famillecollet.com/) repo for some of the php packages. 
+     - ```yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm```
+    - ```yum install http://rpms.famillecollet.com/enterprise/remi-release-7.rpm```
+1. ```yum install gearmand php-pecl-gearman --enablerepo=remi-php<php version on your system>```. For example, if you are using php 7.2 your command would look like this ```yum install gearmand php-pecl-gearman --enablerepo=remi-php72```
+1. Optionally, install supervisord if you prefer it
+    - ```yum install python-pip```
+    - ```easy_install supervisor```
+1. If everything is running on one server, I would recommend limiting connections to localhost only. If not, you'll want to set up firewall rules to only allow certain clients to connect on the Gearman port (Default 4730)
+    - edit ```/etc/sysconfig/gearmand``` - set ```OPTIONS="--listen=localhost"```
+1. ```systemctl enable gearmand```
+1. ```systemctl start gearmand```
 
 #### Backend Setup - Ubuntu
 
@@ -75,7 +89,7 @@ Filling in values in ```<brackets>``` as required, add the following config to e
 
 ```sh
 [program:my_wp_minions_workers]
-command=/usr/bin/php <path_to_wordpress>/wp-minions-runner.php
+command=/usr/bin/env php <path_to_wordpress>/wp-minions-runner.php
 process_name=%(program_name)s-%(process_num)02d
 numprocs=<number_of_minions>
 directory=<path_to_temp_directory>
@@ -88,7 +102,7 @@ user=<user>
 * path_to_wordpress: Absolute path to the root of your WordPress install, ex: ```/var/www/html/wordpress```
 * number_of_minions: How many minions should be spawned (How many jobs can be running at once).
 * path_to_temp_directory: probably should just be the same as path_to_wordpress.
-* user: The system user to run the processes under, probably apache, nginx, or www-data.
+* user: The system user to run the processes under, probably apache (CentOS), nginx (CentOS), or www-data (Ubuntu).
 * You can optionally change the "my_wp_minions_workers" text to something more descriptive, if you'd like.
 
 After updating the supervisor configuration, restart the service (CentOS or Ubuntu)
@@ -99,6 +113,41 @@ systemctl restart supervisord
 ```
 service supervisor restart
 ```
+
+#### Systemd Configuration (CentOS 7.x)
+
+Filling in values in ```<brackets>``` as required, add the following to /etc/systemd/system/wp-minions-runner@.service
+
+```
+[Unit]
+Description=WP-Minions Runner %i
+After=network.target
+
+[Service]
+PIDFile=/var/run/wp-minions-runner.%i.pid
+User=<user>
+Type=simple
+ExecStart=/usr/bin/env php <path_to_wordpress>/wp-minions-runner.php
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+* path_to_wordpress: Absolute path to the root of your WordPress install, ex: ```/var/www/html/wordpress```
+* user: The system user to run the processes under, probably apache (CentOS), nginx (CentOS), or www-data (Ubuntu).
+
+Reload systemd:
+
+```systemctl daemon-reload```
+
+Enable and start as many runners as you'd like to have running:
+
+```
+systemctl enable wp-minions-runner@{1..n}
+systemctl start wp-minions-runner@{1..n}
+```
+
+Where 'n' is the number of processes you want. 
 
 #### WordPress Configuration
 
