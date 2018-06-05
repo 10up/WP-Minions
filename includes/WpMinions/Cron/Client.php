@@ -30,9 +30,31 @@ class Client extends BaseClient {
 	 */
 	public function add( $hook, $args = array(), $priority = 'normal' ) {
 		// Priority isn't really something we can manage with wp-cron
-		wp_schedule_single_event( time(), $hook, $args );
+		$job_data = array(
+			'hook'    => $hook,
+			'args'    => $args,
+			'blog_id' => get_current_blog_id(),
+		);
+
+		$job_data = apply_filters( 'wp_async_task_add_job_data', $job_data );
+
+		if ( function_exists( 'is_multisite' ) && is_multisite() && $job_data['blog_id'] ) {
+			$blog_id = $job_data['blog_id'];
+
+			if ( get_current_blog_id() !== $blog_id ) {
+				switch_to_blog( $blog_id );
+				$switched = true;
+			} else {
+				$switched = false;
+			}
+		}
+
+		wp_schedule_single_event( time(), $job_data['hook'], $job_data['args'] );
+
+		if ( $switched ) {
+			restore_current_blog();
+		}
 
 		return true;
 	}
-
 }

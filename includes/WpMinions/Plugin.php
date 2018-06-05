@@ -316,7 +316,7 @@ class Plugin {
 	 * @return string Path to the wp-load.php file
 	 */
 	function get_wp_load() {
-		$wp_dir  = dirname( $_SERVER['SCRIPT_FILENAME'] ) ;
+		$wp_dir  = dirname( $_SERVER['SCRIPT_FILENAME'] );
 		return $wp_dir . '/wp-load.php';
 	}
 
@@ -338,5 +338,4 @@ class Plugin {
 			return $this->quit( 1 );
 		}
 	}
-
 }

@@ -45,7 +45,7 @@ class Client extends BaseClient {
 
 				if ( ! defined( 'PHPUNIT_RUNNER' ) ) {
 					error_log( "Fatal Gearman Error: Failed to register servers ($servers)" );
-					error_log( "  Cause: " . $e->getMessage() );
+					error_log( '  Cause: ' . $e->getMessage() );
 				}
 
 				return false;
@@ -70,6 +70,8 @@ class Client extends BaseClient {
 			'blog_id' => $this->get_blog_id(),
 		);
 
+		$job_data = apply_filters( 'wp_async_task_add_job_data', $job_data );
+
 		$client = $this->get_gearman_client();
 
 		if ( $client !== false ) {
@@ -80,6 +82,7 @@ class Client extends BaseClient {
 
 			return call_user_func( $callable, $group, $payload );
 		} else {
+			error_log( 'Client fail' );
 			return false;
 		}
 	}
@@ -93,7 +96,7 @@ class Client extends BaseClient {
 	 * @return string The corresponding method name
 	 */
 	function get_background_method( $priority ) {
-		switch( strtolower( $priority ) ) {
+		switch ( strtolower( $priority ) ) {
 			case 'high':
 				$method = 'doHighBackground';
 				break;
@@ -178,5 +181,4 @@ class Client extends BaseClient {
 	function get_blog_id() {
 		return function_exists( 'is_multisite' ) && is_multisite() ? get_current_blog_id() : false;
 	}
-
 }
