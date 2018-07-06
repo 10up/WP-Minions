@@ -30,7 +30,7 @@ class Client extends BaseClient {
 	 */
 	public function add( $hook, $args = array(), $priority = 'normal' ) {
 		// Priority isn't really something we can manage with wp-cron
-		wp_schedule_single_event( time(), $hook, $args );
+		wp_schedule_single_event( time(), $hook, array( $args ) );
 
 		return true;
 	}
