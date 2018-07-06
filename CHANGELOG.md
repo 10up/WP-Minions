@@ -4,6 +4,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [4.0.0]
+Fixed a bug with the WP Cron client where $args were passed to callback functions as individual callback args, instead of as a single array as intended. 
+
 ## [3.0.0]
 Renamed from WP Gears to WP Minions, to better reflect that this is designed to be used with any job queue backend - not just Gearman
 
