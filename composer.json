@@ -2,7 +2,7 @@
     "name": "10up/wp-minions",
     "description": "Job Queue for WordPress",
     "type": "wordpress-plugin",
-    "license": "GPLv2",
+    "license": "GPL-2.0-or-later",
     "authors": [
         {
             "name": "Chris Marslender",

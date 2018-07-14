@@ -21,7 +21,7 @@ class CronClientTest extends \WP_UnitTestCase {
 		$actual = $this->client->add( 'cron_action_a' );
 		$this->assertTrue( $actual );
 
-		$next_event = wp_next_scheduled( 'cron_action_a', array() );
+		$next_event = wp_next_scheduled( 'cron_action_a', array( array() ) );
 		$this->assertEquals( time(), $next_event, '', 1000 );
 	}
 

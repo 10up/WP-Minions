@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP Minions
  * Description: Job Queue for WordPress
- * Version: 3.0.0
+ * Version: 4.0.0
  * Author: Chris Marslender, Darshan Sawardekar, 10up
  * Author URI: http://10up.com/
  * License: GPLv2 or later
@@ -49,8 +49,10 @@ add_action( 'plugins_loaded', function() {
 	}
 });
 
-// Init
-if ( ! defined( 'PHPUNIT_RUNNER' ) ) {
-	wp_async_task_init();
-}
+add_action( 'plugins_loaded', function() {
+	// Init
+	if ( ! defined( 'PHPUNIT_RUNNER' ) ) {
+		wp_async_task_init();
+	}
+}, 9 );
 
