@@ -1,15 +1,8 @@
 <?php
 
 require_once __DIR__ . '/../../vendor/autoload.php';
-global $aws_credentials;
-$aws_credentials = array(
-	'region'      => 'us-east-1',
-	'version'     => 'latest',
-	'credentials' => array(
-		'key'    => '', //Testing AWS key.
-		'secret' => ' ' //Testing AWS secret.
-	)
-);
+require_once __DIR__ . '/config.php';
+
 
 $connection = new Aws\Sqs\SqsClient( $aws_credentials );
 
