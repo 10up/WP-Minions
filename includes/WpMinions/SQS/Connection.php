@@ -31,7 +31,7 @@ class Connection {
 				$aws_credentials = array();
 			}
 
-			$this->queue_name      = 'fleet';
+			$this->queue_name      = 'wordpress';
 			$this->aws_credentials = $aws_credentials;
 			$this->connection      = new \Aws\Sqs\SqsClient( $this->aws_credentials );
 
