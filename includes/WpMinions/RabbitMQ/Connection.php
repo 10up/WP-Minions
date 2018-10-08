@@ -29,7 +29,17 @@ class Connection {
 			$this->connection = new \PhpAmqpLib\Connection\AMQPStreamConnection( $rabbitmq_server['host'], $rabbitmq_server['port'], $rabbitmq_server['username'], $rabbitmq_server['password'] );
 			$this->channel = $this->connection->channel();
 
-			$this->channel->queue_declare( 'wordpress', false, true, false, false );
+			/**
+			 * RabbitMQ Queue Declare Filter
+			 *
+			 * @param bool bit passive
+			 * @param bool bit durable
+			 * @param bool bit exclusive
+			 * @param bool bit auto-delete
+			 */
+			$rabbitmq_bit_filter = apply_filters( 'wp_minion_rabbitmq_declare_filter', false, true, false, false);
+
+			$this->channel->queue_declare( 'wordpress', $rabbitmq_bit_filter );
 
 			add_action( 'shutdown', array( $this, 'shutdown' ) );
 		} else {
