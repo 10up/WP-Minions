@@ -27,19 +27,14 @@ class Connection {
 			) );
 
 			$this->connection = new \PhpAmqpLib\Connection\AMQPStreamConnection( $rabbitmq_server['host'], $rabbitmq_server['port'], $rabbitmq_server['username'], $rabbitmq_server['password'] );
-			$this->channel = $this->connection->channel();
+			$this->channel    = $this->connection->channel();
 
-			/**
-			 * RabbitMQ Queue Declare Filter
-			 *
-			 * @param bool bit passive
-			 * @param bool bit durable
-			 * @param bool bit exclusive
-			 * @param bool bit auto-delete
-			 */
-			$rabbitmq_bit_filter = apply_filters( 'wp_minion_rabbitmq_declare_filter', false, false, false, false);
+			$rabbitmq_declare_passive_filter    = apply_filters( 'wp_minion_rabbitmq_declare_passive_filter', false );
+			$rabbitmq_declare_durable_filter    = apply_filters( 'wp_minion_rabbitmq_declare_durable_filter', false );
+			$rabbitmq_declare_exclusive_filter  = apply_filters( 'wp_minion_rabbitmq_declare_exclusive_filter', false );
+			$rabbitmq_declare_autodelete_filter = apply_filters( 'wp_minion_rabbitmq_declare_autodelete_filter', false );
 
-			$this->channel->queue_declare( 'wordpress', $rabbitmq_bit_filter );
+			$this->channel->queue_declare( 'wordpress', $rabbitmq_declare_passive_filter, $rabbitmq_declare_durable_filter, $rabbitmq_declare_exclusive_filter, $rabbitmq_declare_autodelete_filter );
 
 			add_action( 'shutdown', array( $this, 'shutdown' ) );
 		} else {
