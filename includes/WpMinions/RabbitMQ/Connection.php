@@ -37,7 +37,7 @@ class Connection {
 			 * @param bool bit exclusive
 			 * @param bool bit auto-delete
 			 */
-			$rabbitmq_bit_filter = apply_filters( 'wp_minion_rabbitmq_declare_filter', false, true, false, false);
+			$rabbitmq_bit_filter = apply_filters( 'wp_minion_rabbitmq_declare_filter', false, false, false, false);
 
 			$this->channel->queue_declare( 'wordpress', $rabbitmq_bit_filter );
 
