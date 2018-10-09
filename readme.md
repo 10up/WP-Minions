@@ -151,7 +151,7 @@ Where 'n' is the number of processes you want.
 
 #### WordPress Configuration
 
-Define the `WP_MINIONS_BACKEND` constant in your ```wp-config.php```.  Valid values are `gearman` or `rabbitmq`.  If left blank, it will default to a cron client.
+Define the `WP_MINIONS_BACKEND` constant in your ```wp-config.php```.  Valid values are `gearman`, `rabbitmq`, or `sqs`.  If left blank, it will default to a cron client.
 ```
 define( 'WP_MINIONS_BACKEND', 'gearman' );
 ```
