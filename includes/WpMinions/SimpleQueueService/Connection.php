@@ -8,7 +8,7 @@ class Connection {
 
 	/**
 	 * Establish a connection to AWS SQS
-	 * @throws RuntimeException is AWS PHP SDK isn't loaded
+	 * @throws RuntimeException if AWS PHP SDK isn't loaded
 	 */
 	public static function connect() {
 		if ( class_exists( 'Aws\Sqs\SqsClient' ) ) {
