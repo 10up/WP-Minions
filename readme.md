@@ -170,7 +170,7 @@ $gearman_servers = array(
 # RabbitMQ config
 global $rabbitmq_server;
 $rabbitmq_server = array(
-  'host'     => '127.0.0.1' ),
+  'host'     => '127.0.0.1',
   'port'     => 5672,
   'username' => 'guest',
   'password' => 'guest',
