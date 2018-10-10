@@ -4,11 +4,17 @@ namespace WpMinions\SimpleQueueService;
 
 use WpMinions\Worker as BaseWorker;
 use Aws\Sqs\SqsClient;
+use Aws\Result;
 
 /**
  *
  */
 class Worker extends BaseWorker {
+
+	/**
+	 * @var SqsClient The AWS SDK for PHP Client instance
+	 */
+	public $sqs_client;
 
 	/**
 	 * Creates a SQS Worker and initializes the servers it should
@@ -17,11 +23,15 @@ class Worker extends BaseWorker {
 	 * @return bool True if operation was successful else false.
 	 */
 	public function register() {
-		$client = $this->get_sqs_client();
-
-		if ( ! $client  ) {
-			return false;
+		try {
+			$client = $this->get_sqs_client();
 		}
+		catch (Exception $e) {
+			error_log( "Fatal SQS Error: Failed to connect" );
+			error_log( "  Cause: " . $e->getMessage() );
+		}
+
+		return $client !== false;
 	}
 
 	/**
@@ -31,20 +41,64 @@ class Worker extends BaseWorker {
 	 * @return bool True if the job could be executed, else false
 	 */
 	public function work() {
+		$payload = false;
+		$receiptHandle = false;
 		$client = $this->get_sqs_client();
 
 		try {
-			$result = $worker->work();
+			if ( $client !== false ) {
+				$createQueueResult = $client->createQueue(
+					array(
+						'QueueName' => $this->get_queue_name()
+					)
+				);
+	
+				$callable = array( $client, 'receiveMessage' );
+	
+				$receiveMessageResult = call_user_func( $callable, array(
+					'QueueUrl'    => $createQueueResult['QueueUrl'],
+					'MaxNumberOfMessages' => 1,
+				) );
+
+				if( $receiveMessageResult instanceof \Aws\Result ) {
+					$messages = $receiveMessageResult->get('Messages');
+					if( isset( $messages[0]['Body'] ) ) {
+						$payload = $messages[0]['Body'];
+					}
+					if( isset( $messages[0]['ReceiptHandle'] ) ) {
+						$receiptHandle = $messages[0]['ReceiptHandle'];
+					}
+				}
+				
+			}
+
 		} catch ( \Exception $e ) {
 			if ( ! defined( 'PHPUNIT_RUNNER' ) ) {
-				error_log( 'SQSWorker->work failed: ' . $e->getMessage() );
+				error_log( 'SQSWorker failed to get message: ' . $e->getMessage() );
 			}
-			$result = false;
 		}
 
-		do_action( 'wp_async_task_after_work', $result, $this );
+		do_action( 'wp_async_task_after_work', $payload, $this );
 
-		return $result;
+		if( !empty( $payload ) && !empty( $receiptHandle ) ) {
+
+			try {			
+				$callable = array( $client, 'deleteMessage' );
+	
+				$deleteMessageResult = call_user_func( $callable, array(
+					'QueueUrl'    => $createQueueResult['QueueUrl'],
+					'ReceiptHandle' => $receiptHandle,
+				) );
+
+			}
+			catch ( \Exception $e ) {
+				if ( ! defined( 'PHPUNIT_RUNNER' ) ) {
+					error_log( 'SQSWorker failed to delete message: ' . $e->getMessage() );
+				}
+			}
+		}
+
+		return $payload !== false;
 	}
 
 	/* Helpers */
@@ -132,6 +186,78 @@ class Worker extends BaseWorker {
 		$key .= 'WP_Async_Task';
 
 		return $key;
+	}
+
+	/**
+	 * Retrieves the region for this queue.
+	 * Looks in the AWS_DEFAULT_REGION environment variable.
+	 * Defaults to a hard-coded value.
+	 * @return string region name
+	 */
+	static function get_region_name() {
+		if( isset( $_ENV['AWS_DEFAULT_REGION '] ) ) {
+			return $_ENV['AWS_DEFAULT_REGION '];
+		}
+		else {
+			return 'us-east-1';
+		}
+	}
+
+	/**
+	 * Retrieves the profile name for this queue.
+	 * Looks in the AWS_PROFILE environment variable.
+	 * Defaults to 'default'.
+	 * @return string profile name
+	 */
+	static function get_profile_name() {
+		if( isset( $_ENV['AWS_PROFILE'] ) ) {
+			return $_ENV['AWS_PROFILE'];
+		}
+		else {
+			return 'default';
+		}
+	}
+
+	/**
+	 * The Function Group used to split libGearman functions on a
+	 * multi-network install.
+	 *
+	 * @return string The prefixed group name
+	 */
+	function get_queue_name() {
+		$key = '';
+
+		if ( defined( 'WP_ASYNC_TASK_SALT' ) ) {
+			$key .= WP_ASYNC_TASK_SALT . '-';
+		}
+
+		$key .= 'WP_Async_Task';
+
+		return $key;
+	}
+
+	/**
+	 * Builds the SQS Client Instance if the extension is
+	 * installed. Once created returns the previous instance without
+	 * reinitialization.
+	 *
+	 * @return Aws\Sqs\SqsClient|false An instance of SqsClient
+	 */
+	function get_sqs_client() {
+		if ( is_null( $this->sqs_client ) ) {
+			if ( class_exists( 'Aws\Sqs\SqsClient' ) ) {
+				$this->sqs_client = SqsClient::factory(array(
+					'version' => '2012-11-05',
+					'profile' => self::get_profile_name(),
+					'region'  => self::get_region_name(),
+				));
+			} else {
+				$this->sqs_client = false;
+				throw new RuntimeException('AWS SDK not loaded');
+			}
+		}
+
+		return $this->sqs_client;
 	}
 
 }

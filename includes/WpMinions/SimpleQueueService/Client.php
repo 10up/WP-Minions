@@ -3,7 +3,9 @@
 namespace WpMinions\SimpleQueueService;
 
 use WpMinions\Client as BaseClient;
-use Aws\Sqs\SqsClient;
+use Aws\Sqs\SqsClient as SqsClient;
+use Aws\Exception\AwsException as AwsException;
+use \RuntimeException as RuntimeException;
 
 /**
  */
@@ -14,7 +16,6 @@ class Client extends BaseClient {
 	 */
 	public $sqs_client;
 
-
 	/**
 	 * Creates a new SQS Client instance and configures the
 	 * queue that it should connect to.
@@ -22,11 +23,15 @@ class Client extends BaseClient {
 	 * @return bool True or false if successful
 	 */
 	public function register() {
-		$client = $this->get_sqs_client();
-
-		if ( ! $client  ) {
-			return false;
+		try {
+			$client = $this->get_sqs_client();
 		}
+		catch (Exception $e) {
+			error_log( "Fatal SQS Error: Failed to connect" );
+			error_log( "  Cause: " . $e->getMessage() );
+		}
+
+		return $client !== false;
 	}
 
 	/**
@@ -48,17 +53,19 @@ class Client extends BaseClient {
 
 		if ( $client !== false ) {
 			$payload  = json_encode( $job_data );
-			$queueURL = $client->createQueue(
+			$result = $client->createQueue(
 				array(
 					'QueueName' => $this->get_queue_name()
 				)
 			);
+
 			$callable = array( $client, 'sendMessage' );
 
 			return call_user_func( $callable, array(
-				'QueueUrl'    => $queueURL,
+				'QueueUrl'    => $result['QueueUrl'],
 				'MessageBody' => $payload,
 			) );
+			
 		} else {
 			return false;
 		}
@@ -76,7 +83,7 @@ class Client extends BaseClient {
 		$key = '';
 
 		if ( defined( 'WP_ASYNC_TASK_SALT' ) ) {
-			$key .= WP_ASYNC_TASK_SALT . ':';
+			$key .= WP_ASYNC_TASK_SALT . '-';
 		}
 
 		$key .= 'WP_Async_Task';
@@ -93,13 +100,15 @@ class Client extends BaseClient {
 	 */
 	function get_sqs_client() {
 		if ( is_null( $this->sqs_client ) ) {
-			if ( class_exists( 'SqsClient' ) ) {
+			if ( class_exists( 'Aws\Sqs\SqsClient' ) ) {
 				$this->sqs_client = SqsClient::factory(array(
+					'version' => '2012-11-05',
 					'profile' => self::get_profile_name(),
-					'region'  => self::get_region_name()
+					'region'  => self::get_region_name(),
 				));
 			} else {
 				$this->sqs_client = false;
+				throw new RuntimeException('AWS SDK not loaded');
 			}
 		}
 
