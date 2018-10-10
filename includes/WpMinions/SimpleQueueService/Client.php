@@ -55,7 +55,7 @@ class Client extends BaseClient {
 			$payload  = json_encode( $job_data );
 			$result = $client->createQueue(
 				array(
-					'QueueName' => $this->get_queue_name()
+					'QueueName' => Connection::get_queue_name()
 				)
 			);
 
@@ -74,24 +74,6 @@ class Client extends BaseClient {
 	/* Helpers */
 
 	/**
-	 * The Function Group used to split libGearman functions on a
-	 * multi-network install.
-	 *
-	 * @return string The prefixed group name
-	 */
-	function get_queue_name() {
-		$key = '';
-
-		if ( defined( 'WP_ASYNC_TASK_SALT' ) ) {
-			$key .= WP_ASYNC_TASK_SALT . '-';
-		}
-
-		$key .= 'WP_Async_Task';
-
-		return $key;
-	}
-
-	/**
 	 * Builds the SQS Client Instance if the extension is
 	 * installed. Once created returns the previous instance without
 	 * reinitialization.
@@ -100,49 +82,10 @@ class Client extends BaseClient {
 	 */
 	function get_sqs_client() {
 		if ( is_null( $this->sqs_client ) ) {
-			if ( class_exists( 'Aws\Sqs\SqsClient' ) ) {
-				$this->sqs_client = SqsClient::factory(array(
-					'version' => '2012-11-05',
-					'profile' => self::get_profile_name(),
-					'region'  => self::get_region_name(),
-				));
-			} else {
-				$this->sqs_client = false;
-				throw new RuntimeException('AWS SDK not loaded');
-			}
+			$this->sqs_client = Connection::connect();
 		}
 
 		return $this->sqs_client;
-	}
-
-	/**
-	 * Retrieves the region for this queue.
-	 * Looks in the AWS_DEFAULT_REGION environment variable.
-	 * Defaults to a hard-coded value.
-	 * @return string region name
-	 */
-	static function get_region_name() {
-		if( isset( $_ENV['AWS_DEFAULT_REGION '] ) ) {
-			return $_ENV['AWS_DEFAULT_REGION '];
-		}
-		else {
-			return 'us-east-1';
-		}
-	}
-
-	/**
-	 * Retrieves the profile name for this queue.
-	 * Looks in the AWS_PROFILE environment variable.
-	 * Defaults to 'default'.
-	 * @return string profile name
-	 */
-	static function get_profile_name() {
-		if( isset( $_ENV['AWS_PROFILE'] ) ) {
-			return $_ENV['AWS_PROFILE'];
-		}
-		else {
-			return 'default';
-		}
 	}
 
 	/**

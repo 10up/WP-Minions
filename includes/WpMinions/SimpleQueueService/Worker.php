@@ -3,7 +3,6 @@
 namespace WpMinions\SimpleQueueService;
 
 use WpMinions\Worker as BaseWorker;
-use Aws\Sqs\SqsClient;
 use Aws\Result;
 
 /**
@@ -17,21 +16,21 @@ class Worker extends BaseWorker {
 	public $sqs_client;
 
 	/**
-	 * Creates a SQS Worker and initializes the servers it should
-	 * connect to. The callback that will execute a job's hook is also setup here.
+	 * Creates a SQS Worker and connects to AWS SQS.
+	 * The callback that will execute a job's hook is also setup here.
 	 *
 	 * @return bool True if operation was successful else false.
 	 */
 	public function register() {
 		try {
-			$client = $this->get_sqs_client();
+			$this->sqs_client = $this->get_sqs_client();
 		}
 		catch (Exception $e) {
 			error_log( "Fatal SQS Error: Failed to connect" );
 			error_log( "  Cause: " . $e->getMessage() );
 		}
 
-		return $client !== false;
+		return $this->sqs_client !== false;
 	}
 
 	/**
@@ -43,17 +42,16 @@ class Worker extends BaseWorker {
 	public function work() {
 		$payload = false;
 		$receiptHandle = false;
-		$client = $this->get_sqs_client();
 
 		try {
-			if ( $client !== false ) {
-				$createQueueResult = $client->createQueue(
+			if ( $this->sqs_client !== false ) {
+				$createQueueResult = $this->sqs_client->createQueue(
 					array(
-						'QueueName' => $this->get_queue_name()
+						'QueueName' => Connection::get_queue_name()
 					)
 				);
 	
-				$callable = array( $client, 'receiveMessage' );
+				$callable = array( $this->sqs_client, 'receiveMessage' );
 	
 				$receiveMessageResult = call_user_func( $callable, array(
 					'QueueUrl'    => $createQueueResult['QueueUrl'],
@@ -83,7 +81,7 @@ class Worker extends BaseWorker {
 		if( !empty( $payload ) && !empty( $receiptHandle ) ) {
 
 			try {			
-				$callable = array( $client, 'deleteMessage' );
+				$callable = array( $this->sqs_client, 'deleteMessage' );
 	
 				$deleteMessageResult = call_user_func( $callable, array(
 					'QueueUrl'    => $createQueueResult['QueueUrl'],
@@ -102,6 +100,7 @@ class Worker extends BaseWorker {
 	}
 
 	/* Helpers */
+
 	/**
 	 * Executes a Job pulled from SQS. On a multisite instance
 	 * it switches to the target site before executing the job. And the
@@ -157,6 +156,7 @@ class Worker extends BaseWorker {
 
 			$result = true;
 		} catch ( \Exception $e ) {
+			
 			error_log(
 				'SQSWorker->do_job failed: ' . $e->getMessage()
 			);
@@ -171,72 +171,6 @@ class Worker extends BaseWorker {
 	}
 
 	/**
-	 * The Function Group used to split libSQS functions on a
-	 * multi-network install.
-	 *
-	 * @return string The prefixed group name
-	 */
-	function get_async_group() {
-		$key = '';
-
-		if ( defined( 'WP_ASYNC_TASK_SALT' ) ) {
-			$key .= WP_ASYNC_TASK_SALT . ':';
-		}
-
-		$key .= 'WP_Async_Task';
-
-		return $key;
-	}
-
-	/**
-	 * Retrieves the region for this queue.
-	 * Looks in the AWS_DEFAULT_REGION environment variable.
-	 * Defaults to a hard-coded value.
-	 * @return string region name
-	 */
-	static function get_region_name() {
-		if( isset( $_ENV['AWS_DEFAULT_REGION '] ) ) {
-			return $_ENV['AWS_DEFAULT_REGION '];
-		}
-		else {
-			return 'us-east-1';
-		}
-	}
-
-	/**
-	 * Retrieves the profile name for this queue.
-	 * Looks in the AWS_PROFILE environment variable.
-	 * Defaults to 'default'.
-	 * @return string profile name
-	 */
-	static function get_profile_name() {
-		if( isset( $_ENV['AWS_PROFILE'] ) ) {
-			return $_ENV['AWS_PROFILE'];
-		}
-		else {
-			return 'default';
-		}
-	}
-
-	/**
-	 * The Function Group used to split libGearman functions on a
-	 * multi-network install.
-	 *
-	 * @return string The prefixed group name
-	 */
-	function get_queue_name() {
-		$key = '';
-
-		if ( defined( 'WP_ASYNC_TASK_SALT' ) ) {
-			$key .= WP_ASYNC_TASK_SALT . '-';
-		}
-
-		$key .= 'WP_Async_Task';
-
-		return $key;
-	}
-
-	/**
 	 * Builds the SQS Client Instance if the extension is
 	 * installed. Once created returns the previous instance without
 	 * reinitialization.
@@ -245,16 +179,7 @@ class Worker extends BaseWorker {
 	 */
 	function get_sqs_client() {
 		if ( is_null( $this->sqs_client ) ) {
-			if ( class_exists( 'Aws\Sqs\SqsClient' ) ) {
-				$this->sqs_client = SqsClient::factory(array(
-					'version' => '2012-11-05',
-					'profile' => self::get_profile_name(),
-					'region'  => self::get_region_name(),
-				));
-			} else {
-				$this->sqs_client = false;
-				throw new RuntimeException('AWS SDK not loaded');
-			}
+			$this->sqs_client = Connection::connect();
 		}
 
 		return $this->sqs_client;
