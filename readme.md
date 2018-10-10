@@ -156,13 +156,27 @@ Define the `WP_MINIONS_BACKEND` constant in your ```wp-config.php```.  Valid val
 define( 'WP_MINIONS_BACKEND', 'gearman' );
 ```
 
-If your gearman service not running locally or uses a non-standard port, you'll need define your gearman servers in ```wp-config.php```
-```php
+If your job queue service not running locally or uses a non-standard port, you'll need define your servers in ```wp-config.php```
+
+```:php
+# Gearman config
 global $gearman_servers;
 $gearman_servers = array(
   '127.0.0.1:4730',
 );
 ```
+
+```:php
+# RabbitMQ config
+global $rabbitmq_server;
+$rabbitmq_server = array(
+  'host'     => '127.0.0.1' ),
+  'port'     => 5672,
+  'username' => 'guest',
+  'password' => 'guest',
+);
+
+Note: On RabbitMQ the guest/guest account is the default administrator account, RabbitMQ will only allow connections connections on that account from localhost. Connections to any non-loopback address will be denied. See the RabbitMQ manual on [user management](https://www.rabbitmq.com/rabbitmqctl.8.html#User_Management) and [Access Control](https://www.rabbitmq.com/rabbitmqctl.8.html#Access_Control) for information on adding users and allowing them access to RabbitMQ resources.
 
 ## MySQL Persistent Queue (Recommended)
 
