@@ -7,7 +7,8 @@ use Aws\Sqs\SqsClient;
 class Connection {
 
 	/**
-	 * Establish a connection to AWS SQS
+	 * Establish a connection to AWS SQS.
+	 * 
 	 * @throws RuntimeException if AWS PHP SDK isn't loaded
 	 */
 	public static function connect() {
@@ -23,19 +24,19 @@ class Connection {
 	}
 
 	/**
-	 * The Function Group used to split libGearman functions on a
-	 * multi-network install.
+	 * Builds a queue name for the async tasks.
 	 *
-	 * @return string The prefixed group name
+	 * @param string $baseName The unprefixed queue name
+	 * @return string Queue name, possibly prefixed
 	 */
-	public static function get_queue_name() {
+	public static function get_queue_name( $baseName = 'WP_Async_Task' ) {
 		$key = '';
 
 		if ( defined( 'WP_ASYNC_TASK_SALT' ) ) {
 			$key .= WP_ASYNC_TASK_SALT . '-';
 		}
 
-		$key .= 'WP_Async_Task';
+		$key .= $baseName;
 
 		return $key;
 	}
