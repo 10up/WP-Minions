@@ -2,7 +2,7 @@ WP Minions [![Build Status](https://travis-ci.org/10up/WP-Minions.svg?branch=mas
 ========
 
 Provides a framework for using job queues with [WordPress](http://wordpress.org/) for asynchronous task running.
-Provides an integration with [Gearman](http://gearman.org/) and [RabbitMQ](https://www.rabbitmq.com) out of the box.
+Provides an integration with [Gearman](http://gearman.org/), [RabbitMQ](https://www.rabbitmq.com), and [AWS Simple Queue Service](https://aws.amazon.com/sqs/) out of the box.
 
 <p align="center">
 <a href="http://10up.com/contact/"><img src="https://10updotcom-wpengine.s3.amazonaws.com/uploads/2016/10/10up-Github-Banner.png" width="850"></a>
@@ -36,7 +36,7 @@ if ( ! isset( $_SERVER['HTTP_HOST'] ) && defined( 'DOING_ASYNC' ) && DOING_ASYNC
 }
 ```
 
-4. Next, you'll need to choose your job queue system. Gearman and RabbitMQ are supported out of the box.
+4. Next, you'll need to choose your job queue system. Gearman, RabbitMQ, and AWS Simple Queue Service are supported out of the box.
 
 ### Gearman
 
@@ -194,6 +194,32 @@ Note: For some setups, the above will not work as ```/etc/default/gearman-job-se
 
 Then restart the gearman-job-server: ```sudo service gearman-job-server restart```.
 
+### AWS Simple Queue Service
+
+The Simple Queue Service requires a "key" and "secret", stored in a file. Once that is in place, we can install the WordPress plugin and set the configuration options for WordPress.\
+
+#### API Credentials ("key" and "secret")
+
+Open [AWS IAM](https://console.aws.amazon.com/iam/home?region=us-east-1#/home) in your browser and add a user with "Programmatic access". This user needs full access to AWS SQS, which can be provided through the AmazonSQSFullAccess policy (arn:aws:iam::aws:policy/AmazonSQSFullAccess). Once the user is created, copy the "Access key ID" and "Secret access key", which you will need in the next step.
+
+In the home directory of the user(s) who will be running WordPress and the `wp-minions-runner.php` script, create a directory named `.aws` and a file in that directory named `credentials`. The contents of the file shoud look like this, substituting your new "Access Key ID" and "Secret access key":
+
+```
+[default]
+aws_access_key_id=Access Key ID
+aws_secret_access_key=Secret access key
+```
+
+#### WordPress Configuration
+
+Define the `WP_MINIONS_BACKEND` constant in your ```wp-config.php```.  Valid values are `gearman`, `rabbitmq`, or `sqs`.  If left blank, it will default to a cron client.
+```
+define( 'WP_MINIONS_BACKEND', 'sqs' );
+```
+
+#### Configure the wp-minions-runner script
+
+See the Gearman instructions for how to run wp-minions-runner.php automatically to process queued tasks.
 
 ## Verification
 
