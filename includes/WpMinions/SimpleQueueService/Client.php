@@ -8,6 +8,7 @@ use Aws\Exception\AwsException as AwsException;
 use \RuntimeException as RuntimeException;
 
 /**
+ * Client for adding new tasks to an AWS SQS queue.
  */
 class Client extends BaseClient {
 

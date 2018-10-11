@@ -4,6 +4,9 @@ namespace WpMinions\SimpleQueueService;
 
 use Aws\Sqs\SqsClient;
 
+/**
+ * Utility methods for connecting to AWS SQS and configuring the queue.
+ */
 class Connection {
 
 	/**

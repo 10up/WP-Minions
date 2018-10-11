@@ -6,7 +6,7 @@ use WpMinions\Worker as BaseWorker;
 use Aws\Result;
 
 /**
- *
+ * Async task Worker implementation for AWS SQS.
  */
 class Worker extends BaseWorker {
 
