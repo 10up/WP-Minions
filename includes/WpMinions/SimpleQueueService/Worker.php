@@ -61,7 +61,7 @@ class Worker extends BaseWorker {
 				if( $receiveMessageResult instanceof \Aws\Result ) {
 					$messages = $receiveMessageResult->get('Messages');
 					if( isset( $messages[0]['Body'] ) ) {
-						$payload = $messages[0]['Body'];
+						$payload = json_decode( $messages[0]['Body'] );
 					}
 					if( isset( $messages[0]['ReceiptHandle'] ) ) {
 						$receiptHandle = $messages[0]['ReceiptHandle'];
@@ -76,11 +76,19 @@ class Worker extends BaseWorker {
 			}
 		}
 
-		do_action( 'wp_async_task_after_work', $payload, $this );
+		if( !empty( $payload ) ) {
+			$hook = isset( $payload->hook ) ? $payload->hook : '';
+			$args = isset( $payload->args ) ? (array) $payload->args : array();
+
+			if( !empty( $hook ) ) {
+				do_action( $hook, $args );
+				do_action( 'wp_async_task_after_work', $payload, $this );
+			}
+		}
 
 		if( !empty( $payload ) && !empty( $receiptHandle ) ) {
 
-			try {			
+			try {
 				$callable = array( $this->sqs_client, 'deleteMessage' );
 	
 				$deleteMessageResult = call_user_func( $callable, array(
