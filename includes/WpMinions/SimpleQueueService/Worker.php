@@ -105,7 +105,7 @@ class Worker extends BaseWorker {
 				}
 
 				if( !empty( $receiptHandle ) ) {
-					$this->delete_message( $queue, $receiptHandle );
+					$this->delete_message( $queue['QueueUrl'], $receiptHandle );
 				}
 
 				sleep( self::DELAY_BETWEEN_ITERATIONS );
@@ -185,16 +185,19 @@ class Worker extends BaseWorker {
 	}
 
 	/**
-	 * @return \Aws\Result|false
+	 * Delete a message from an SQS queue
+	 * 
+	 * @param string $queueURL Queue URL
+	 * @param string $receiptHandle Unique message receipt handle
+	 * @return Aws\Result|false
 	 */
-	function delete_message( $queue, $receiptHandle ) {
-
+	function delete_message( $queueURL, $receiptHandle ) {
 		$deleteMessageCallable = array( $this->sqs_client, 'deleteMessage' );
 		$deleteMessageResult = false;
 
 		try {		
 			$deleteMessageResult = call_user_func( $deleteMessageCallable, array(
-				'QueueUrl'    => $queue['QueueUrl'],
+				'QueueUrl'    => $queueURL,
 				'ReceiptHandle' => $receiptHandle,
 			) );
 
