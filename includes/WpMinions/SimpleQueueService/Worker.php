@@ -108,7 +108,6 @@ class Worker extends BaseWorker {
 					$this->delete_message( $queue['QueueUrl'], $receiptHandle );
 				}
 
-				sleep( self::DELAY_BETWEEN_ITERATIONS );
 			}
 		}
 
@@ -133,10 +132,11 @@ class Worker extends BaseWorker {
 	}
 
 	/**
-	 * 
+	 * Get the information to connect to an SQS queue
+	 * @param Aws\Sqs\SqsClient $sqs_client
+	 * @return Aws\Result queue information, URL in [QueueUrl] value
 	 */
 	function get_queue( $sqs_client ) {
-
 		$queue = false;
 
 		try {
@@ -155,6 +155,8 @@ class Worker extends BaseWorker {
 	}
 
 	/**
+	 * Process the payload from an SQS queue
+	 * 
 	 * @param stdClass $payload
 	 * @return void
 	 */
