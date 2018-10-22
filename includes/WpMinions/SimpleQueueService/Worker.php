@@ -103,6 +103,10 @@ class Worker extends BaseWorker {
 				if( !empty( $payload ) ) {
 					$this->process_payload( $payload );
 				}
+				else {
+					// Sleep to let the server rest before checking the queue again.
+					sleep( self::DELAY_BETWEEN_ITERATIONS );
+				}
 
 				if( !empty( $receiptHandle ) ) {
 					$this->delete_message( $queue['QueueUrl'], $receiptHandle );
