@@ -15,7 +15,7 @@ class Worker extends BaseWorker {
 	 */
 	public $sqs_client;
 
-	const DELAY_BETWEEN_ITERATIONS = 30; /* seconds */
+	const DELAY_BETWEEN_ITERATIONS = 5; /* seconds */
 
 	/**
 	 * Creates a SQS Worker and connects to AWS SQS.
