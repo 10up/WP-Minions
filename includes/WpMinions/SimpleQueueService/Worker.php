@@ -15,6 +15,8 @@ class Worker extends BaseWorker {
 	 */
 	public $sqs_client;
 
+	const DELAY_BETWEEN_ITERATIONS = 30; /* seconds */
+
 	/**
 	 * Creates a SQS Worker and connects to AWS SQS.
 	 * The callback that will execute a job's hook is also setup here.
@@ -55,91 +57,62 @@ class Worker extends BaseWorker {
 	 * 5. wp_async_task_after_job_foo
 	 *
 	 * @param array $job The job object data.
-	 * @return bool True if the job could be executed, else false
+	 * @return bool False if the jobs could be executed, else never returns
 	 */
 	public function work() {
 		
-		$payload = false;
-		$receiptHandle = false;
-		$switched = false;
+		$queue = false;
 
-		try {
-			if ( $this->sqs_client !== false ) {
-				$createQueueResult = $this->sqs_client->createQueue(
-					array(
-						'QueueName' => Connection::get_queue_name()
-					)
-				);
-	
-				$callable = array( $this->sqs_client, 'receiveMessage' );
-	
-				$receiveMessageResult = call_user_func( $callable, array(
-					'QueueUrl'    => $createQueueResult['QueueUrl'],
-					'MaxNumberOfMessages' => 1,
-				) );
-
-				if( $receiveMessageResult instanceof \Aws\Result ) {
-					$messages = $receiveMessageResult->get('Messages');
-					if( isset( $messages[0]['Body'] ) ) {
-						$payload = json_decode( $messages[0]['Body'] );
-					}
-					if( isset( $messages[0]['ReceiptHandle'] ) ) {
-						$receiptHandle = $messages[0]['ReceiptHandle'];
-					}
-				}
-				
-			}
-
-		} catch ( \Exception $e ) {
+		if( false === $this->sqs_client ) {
 			if ( ! defined( 'PHPUNIT_RUNNER' ) ) {
-				error_log( 'SQSWorker failed to get message: ' . $e->getMessage() );
+				error_log( 'SQSWorker could not execute: sqs_client failed to initialize' );
 			}
+
+			return false;
 		}
 
-		if( !empty( $payload ) ) {
-			$hook = isset( $payload->hook ) ? $payload->hook : '';
-			$args = isset( $payload->args ) ? (array) $payload->args : array();
+		$receiveMessageCallable = array( $this->sqs_client, 'receiveMessage' );
 
-			if ( function_exists( 'is_multisite' ) && is_multisite() && $job_data['blog_id'] ) {
-				$blog_id = $payload->blog_id;
+		if( $queue = $this->get_queue( $this->sqs_client ) ) {
+			while( true ) {
 
-				if ( get_current_blog_id() !== $blog_id ) {
-					switch_to_blog( $blog_id );
-					$switched = true;
+				$payload = false;
+				$receiptHandle = false;
+		
+				try {	
+						$receiveMessageResult = call_user_func( $receiveMessageCallable, array(
+							'QueueUrl'    => $queue['QueueUrl'],
+							'MaxNumberOfMessages' => 1,
+						) );
+
+						if( $receiveMessageResult instanceof \Aws\Result ) {
+							$messages = $receiveMessageResult->get('Messages');
+							if( isset( $messages[0]['Body'] ) ) {
+								$payload = json_decode( $messages[0]['Body'] );
+							}
+							if( isset( $messages[0]['ReceiptHandle'] ) ) {
+								$receiptHandle = $messages[0]['ReceiptHandle'];
+							}
+						}
+				} catch ( \Exception $e ) {
+					if ( ! defined( 'PHPUNIT_RUNNER' ) ) {
+						error_log( 'SQSWorker failed to get message: ' . $e->getMessage() );
+					}
 				}
-			}
 
-			if( !empty( $hook ) ) {
-				do_action( $hook, $args );
-			}
-
-			do_action( 'wp_async_task_after_work', $payload, $this );
-
-			if ( $switched ) {
-				restore_current_blog();
-			}
-
-		}
-
-		if( !empty( $payload ) && !empty( $receiptHandle ) ) {
-
-			try {
-				$callable = array( $this->sqs_client, 'deleteMessage' );
-	
-				$deleteMessageResult = call_user_func( $callable, array(
-					'QueueUrl'    => $createQueueResult['QueueUrl'],
-					'ReceiptHandle' => $receiptHandle,
-				) );
-
-			}
-			catch ( \Exception $e ) {
-				if ( ! defined( 'PHPUNIT_RUNNER' ) ) {
-					error_log( 'SQSWorker failed to delete message: ' . $e->getMessage() );
+				if( !empty( $payload ) ) {
+					$this->process_payload( $payload );
 				}
+
+				if( !empty( $receiptHandle ) ) {
+					$this->delete_message( $queue, $receiptHandle );
+				}
+
+				sleep( self::DELAY_BETWEEN_ITERATIONS );
 			}
 		}
 
-		return $payload !== false;
+		return false;
 	}
 
 	/* Helpers */
@@ -157,6 +130,82 @@ class Worker extends BaseWorker {
 		}
 
 		return $this->sqs_client;
+	}
+
+	/**
+	 * 
+	 */
+	function get_queue( $sqs_client ) {
+
+		$queue = false;
+
+		try {
+			$queue = $sqs_client->createQueue(
+				array(
+					'QueueName' => Connection::get_queue_name()
+				)
+			);
+		} catch ( \Exception $e ) {
+			if ( ! defined( 'PHPUNIT_RUNNER' ) ) {
+				error_log( 'SQSWorker failed to create queue: ' . $e->getMessage() );
+			}
+		}
+
+		return $queue;
+	}
+
+	/**
+	 * @param stdClass $payload
+	 * @return void
+	 */
+	function process_payload( $payload ) {
+		$hook = isset( $payload->hook ) ? $payload->hook : '';
+		$args = isset( $payload->args ) ? (array) $payload->args : array();
+		
+		$switched = false;
+
+		if ( function_exists( 'is_multisite' ) && is_multisite() && !empty( $payload->blog_id ) ) {
+			$blog_id = $payload->blog_id;
+
+			if ( get_current_blog_id() !== $blog_id ) {
+				switch_to_blog( $blog_id );
+				$switched = true;
+			}
+		}
+
+		if( !empty( $hook ) ) {
+			do_action( $hook, $args );
+		}
+
+		do_action( 'wp_async_task_after_work', $payload, $this );
+
+		if ( $switched ) {
+			restore_current_blog();
+		}
+	}
+
+	/**
+	 * @return \Aws\Result|false
+	 */
+	function delete_message( $queue, $receiptHandle ) {
+
+		$deleteMessageCallable = array( $this->sqs_client, 'deleteMessage' );
+		$deleteMessageResult = false;
+
+		try {		
+			$deleteMessageResult = call_user_func( $deleteMessageCallable, array(
+				'QueueUrl'    => $queue['QueueUrl'],
+				'ReceiptHandle' => $receiptHandle,
+			) );
+
+		}
+		catch ( \Exception $e ) {
+			if ( ! defined( 'PHPUNIT_RUNNER' ) ) {
+				error_log( 'SQSWorker failed to delete message: ' . $e->getMessage() );
+			}
+		}
+
+		return $deleteMessageResult;
 	}
 
 }
