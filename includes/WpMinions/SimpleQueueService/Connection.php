@@ -15,12 +15,27 @@ class Connection {
 	 * @throws RuntimeException if AWS PHP SDK isn't loaded
 	 */
 	public static function connect() {
+		global $awssqs_server;
+
 		if ( class_exists( 'Aws\Sqs\SqsClient' ) ) {
-			return SqsClient::factory(array(
+			$clientConfig = array(
 				'version' => '2012-11-05',
-				'profile' => self::get_profile_name(),
 				'region'  => self::get_region_name(),
-			));
+			);
+
+			if( !empty( $awssqs_server ) ) {
+				if( isset( $awssqs_server['access_key'] ) && isset( $awssqs_server['secret'] ) ) {
+					$clientConfig['credentials'] = array(
+						'key'    => $awssqs_server['access_key'],
+						'secret' => $awssqs_server['secret'],
+					);
+				}
+			}
+			else {
+				$clientConfig['profile'] = self::get_profile_name();
+			}
+
+			return SqsClient::factory( $clientConfig );
 		} else {
 			throw new RuntimeException('AWS SDK not loaded');
 		}
@@ -52,7 +67,12 @@ class Connection {
 	 * @return string region name
 	 */
 	public static function get_region_name( $default = 'us-east-1' ) {
-		if( isset( $_ENV['AWS_DEFAULT_REGION '] ) ) {
+		global $awssqs_server;
+
+		if( isset( $awssqs_server['region'] ) ) {
+			return $awssqs_server['region'];
+		}
+		else if( isset( $_ENV['AWS_DEFAULT_REGION '] ) ) {
 			return $_ENV['AWS_DEFAULT_REGION '];
 		}
 		else {
@@ -68,7 +88,12 @@ class Connection {
 	 * @return string profile name
 	 */
 	public static function get_profile_name( $default = 'default' ) {
-		if( isset( $_ENV['AWS_PROFILE'] ) ) {
+		global $awssqs_server;
+
+		if( isset( $awssqs_server['profile'] ) ) {
+			return $awssqs_server['profile'];
+		}
+		else if( isset( $_ENV['AWS_PROFILE'] ) ) {
 			return $_ENV['AWS_PROFILE'];
 		}
 		else {
