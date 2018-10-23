@@ -202,12 +202,50 @@ The Simple Queue Service requires a "key" and "secret", stored in a file. Once t
 
 Open [AWS IAM](https://console.aws.amazon.com/iam/home?region=us-east-1#/home) in your browser and add a user with "Programmatic access". This user needs full access to AWS SQS, which can be provided through the AmazonSQSFullAccess policy (arn:aws:iam::aws:policy/AmazonSQSFullAccess). Once the user is created, copy the "Access key ID" and "Secret access key", which you will need in the next step.
 
+There are multiple ways to provide AWS credentials to WP Minions:
+
+##### wp-config.php
+
+The most straightforward way to connect WP Minions with AWS is to define your AWS credentials in ```wp-config.php```:
+
+```php
+global $awssqs_server;
+$awssqs_server = array(
+  'access_key' => Access Key ID,
+  'secret' => Secret access key,
+  'region' => Region, // optional
+);
+```
+
+##### .aws Directory
+
 In the home directory of the user(s) who will be running WordPress and the `wp-minions-runner.php` script, create a directory named `.aws` and a file in that directory named `credentials`. The contents of the file shoud look like this, substituting your new "Access Key ID" and "Secret access key":
 
 ```
 [default]
 aws_access_key_id=Access Key ID
 aws_secret_access_key=Secret access key
+```
+
+Multiple profiles can be defined in `.aws/credentials`, for example:
+
+```
+[default]
+aws_access_key_id=Access Key ID
+aws_secret_access_key=Secret access key
+
+[10up]
+aws_access_key_id=Access Key ID
+aws_secret_access_key=Secret access key
+```
+
+Then, specify which profile to use in `wp-config.php`:
+
+```php
+global $awssqs_server;
+$awssqs_server = array(
+  'profile' => '10up', // example
+);
 ```
 
 #### WordPress Configuration
