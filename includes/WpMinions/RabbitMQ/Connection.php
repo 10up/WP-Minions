@@ -24,9 +24,10 @@ class Connection {
 				'port'     => 5672,
 				'username' => 'guest',
 				'password' => 'guest',
+				'vhost'    => '/',
 			) );
 
-			$this->connection = new \PhpAmqpLib\Connection\AMQPStreamConnection( $rabbitmq_server['host'], $rabbitmq_server['port'], $rabbitmq_server['username'], $rabbitmq_server['password'] );
+			$this->connection = new \PhpAmqpLib\Connection\AMQPStreamConnection( $rabbitmq_server['host'], $rabbitmq_server['port'], $rabbitmq_server['username'], $rabbitmq_server['password'], $rabbitmq_server['vhost'] );
 			$this->channel    = $this->connection->channel();
 
 			$rabbitmq_declare_passive_filter    = apply_filters( 'wp_minion_rabbitmq_declare_passive_filter', false );
