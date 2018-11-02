@@ -187,6 +187,8 @@ class Plugin {
 					return new \WpMinions\Gearman\Client();
 				} elseif ( 'rabbitmq' === strtolower( $backend ) ) {
 					return new \WpMinions\RabbitMQ\Client();
+				} elseif ( 'sqs' === strtolower( $backend ) ) {
+					return new \WpMinions\SimpleQueueService\Client();
 				} else {
 					return new \WpMinions\Cron\Client();
 				}
@@ -217,6 +219,8 @@ class Plugin {
 					return new \WpMinions\Gearman\Worker();
 				} elseif ( 'rabbitmq' === strtolower( $backend ) ) {
 					return new \WpMinions\RabbitMQ\Worker();
+				} elseif ( 'sqs' === strtolower( $backend ) ) {
+					return new \WpMinions\SimpleQueueService\Worker();
 				} else {
 					return new \WpMinions\Cron\Worker();
 				}
