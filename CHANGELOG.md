@@ -4,6 +4,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [4.1.0]
+- Fixes php-amqplib at 2.8.0
+- Adds filters for rabbitmq queue options
+- Adds options for rabbitmq vhost. Defaults to `/`
+
 ## [4.0.0]
 Fixed a bug with the WP Cron client where $args were passed to callback functions as individual callback args, instead of as a single array as intended. 
 
