@@ -3,7 +3,7 @@
 > Provides a framework for using job queues with [WordPress](http://wordpress.org/) for asynchronous task running.
 Provides an integration with [Gearman](http://gearman.org/) and [RabbitMQ](https://www.rabbitmq.com) out of the box.
 
-[![Build Status](https://travis-ci.org/10up/WP-Minions.svg?branch=master)](https://travis-ci.org/10up/WP-Minions) [![Support Level](https://img.shields.io/badge/support-active-green.svg)](#support-level)
+[![Support Level](https://img.shields.io/badge/support-active-green.svg)](#support-level) [![Build Status](https://travis-ci.org/10up/WP-Minions.svg?branch=master)](https://travis-ci.org/10up/WP-Minions) [![Release Version](https://img.shields.io/github/release/10up/WP-Minions.svg)](https://github.com/10up/WP-Minions/releases/latest) 
 
 ## Background & Purpose
 
