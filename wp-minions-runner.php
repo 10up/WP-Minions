@@ -1,6 +1,6 @@
 <?php
 /**
- * WpMinions Runner
+ * WP Minions Runner
  *
  * IMPORTANT: This file must be placed in (or symlinked to) the root of the WordPress install!
  *
