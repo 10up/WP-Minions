@@ -1,12 +1,9 @@
-WP Minions [![Build Status](https://travis-ci.org/10up/WP-Minions.svg?branch=master)](https://travis-ci.org/10up/WP-Minions)
-========
+# WP Minions
 
-Provides a framework for using job queues with [WordPress](http://wordpress.org/) for asynchronous task running.
+> Provides a framework for using job queues with [WordPress](http://wordpress.org/) for asynchronous task running.
 Provides an integration with [Gearman](http://gearman.org/) and [RabbitMQ](https://www.rabbitmq.com) out of the box.
 
-<p align="center">
-<a href="http://10up.com/contact/"><img src="https://10updotcom-wpengine.s3.amazonaws.com/uploads/2016/10/10up-Github-Banner.png" width="850"></a>
-</p>
+[![Support Level](https://img.shields.io/badge/support-active-green.svg)](#support-level) [![Build Status](https://travis-ci.org/10up/WP-Minions.svg?branch=master)](https://travis-ci.org/10up/WP-Minions) [![Release Version](https://img.shields.io/github/release/10up/WP-Minions.svg)](https://github.com/10up/WP-Minions/releases/latest) [![GPLv2 License](https://img.shields.io/github/license/10up/WP-Minions.svg)](https://github.com/10up/WP-Minions/blob/master/LICENSE.md)
 
 ## Background & Purpose
 
@@ -156,13 +153,27 @@ Define the `WP_MINIONS_BACKEND` constant in your ```wp-config.php```.  Valid val
 define( 'WP_MINIONS_BACKEND', 'gearman' );
 ```
 
-If your gearman service not running locally or uses a non-standard port, you'll need define your gearman servers in ```wp-config.php```
-```php
+If your job queue service not running locally or uses a non-standard port, you'll need define your servers in ```wp-config.php```
+
+```:php
+# Gearman config
 global $gearman_servers;
 $gearman_servers = array(
   '127.0.0.1:4730',
 );
 ```
+
+```:php
+# RabbitMQ config
+global $rabbitmq_server;
+$rabbitmq_server = array(
+  'host'     => '127.0.0.1',
+  'port'     => 5672,
+  'username' => 'guest',
+  'password' => 'guest',
+);
+
+Note: On RabbitMQ the guest/guest account is the default administrator account, RabbitMQ will only allow connections connections on that account from localhost. Connections to any non-loopback address will be denied. See the RabbitMQ manual on [user management](https://www.rabbitmq.com/rabbitmqctl.8.html#User_Management) and [Access Control](https://www.rabbitmq.com/rabbitmqctl.8.html#Access_Control) for information on adding users and allowing them access to RabbitMQ resources.
 
 ## MySQL Persistent Queue (Recommended)
 
@@ -254,6 +265,12 @@ The following constants can be used to customize the behaviour of WP Minions.
 
 If you identify any errors or have an idea for improving the plugin, please [open an issue](https://github.com/10up/WP-Minions/issues). We're excited to see what the community thinks of this project, and we would love your input!
 
-## License
+## Support Level
 
-WP Minions is free software; you can redistribute it and/or modify it under the terms of the [GNU General Public License](http://www.gnu.org/licenses/gpl-2.0.html) as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
+**Active:** 10up is actively working on this, and we expect to continue work for the foreseeable future including keeping tested up to the most recent version of WordPress.  Bug reports, feature requests, questions, and pull requests are welcome.
+
+## Like what you see?
+
+<p align="center">
+<a href="http://10up.com/contact/"><img src="https://10updotcom-wpengine.s3.amazonaws.com/uploads/2016/10/10up-Github-Banner.png" width="850"></a>
+</p>
