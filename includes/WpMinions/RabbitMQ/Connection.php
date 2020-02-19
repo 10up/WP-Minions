@@ -20,11 +20,12 @@ class Connection {
 			}
 
 			$rabbitmq_server = wp_parse_args( $rabbitmq_server, array(
-				'host'     => 'localhost',
-				'port'     => 5672,
-				'username' => 'guest',
-				'password' => 'guest',
-				'vhost'    => '/',
+				'host'                   => 'localhost',
+				'port'                   => 5672,
+				'username'               => 'guest',
+				'password'               => 'guest',
+				'vhost'                  => '/',
+				'shutdown_hook_priority' => 10,
 			) );
 
 			$this->connection = new \PhpAmqpLib\Connection\AMQPStreamConnection( $rabbitmq_server['host'], $rabbitmq_server['port'], $rabbitmq_server['username'], $rabbitmq_server['password'], $rabbitmq_server['vhost'] );
@@ -37,7 +38,7 @@ class Connection {
 
 			$this->channel->queue_declare( 'wordpress', $rabbitmq_declare_passive_filter, $rabbitmq_declare_durable_filter, $rabbitmq_declare_exclusive_filter, $rabbitmq_declare_autodelete_filter );
 
-			add_action( 'shutdown', array( $this, 'shutdown' ) );
+			add_action( 'shutdown', array( $this, 'shutdown' ), $rabbitmq_server['shutdown_hook_priority'] );
 		} else {
 			throw new \Exception( 'Could not create connection.' );
 		}
