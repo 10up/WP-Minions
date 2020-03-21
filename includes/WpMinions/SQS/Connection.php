@@ -31,7 +31,7 @@ class Connection {
 				$aws_credentials = array();
 			}
 
-			$this->queue_name      = 'wordpress';
+			$this->queue_name      = defined( 'WP_ASYNC_SQS_QUEUE' ) ? WP_ASYNC_SQS_QUEUE : 'wordpress';
 			$this->aws_credentials = $aws_credentials;
 			$this->connection      = new \Aws\Sqs\SqsClient( $this->aws_credentials );
 
