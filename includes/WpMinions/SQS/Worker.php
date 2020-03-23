@@ -36,7 +36,10 @@ class Worker extends BaseWorker {
 
 		$message = $this->get_message();
 		if ( empty( $message ) ) {
-			return false;
+			//Wait 3s to avoid too many requests to AWS.
+			sleep( 3 );
+
+			return true;
 		}
 
 		try {
@@ -82,7 +85,7 @@ class Worker extends BaseWorker {
 				'VisibilityTimeout' => 0
 			) );
 
-			$result = false;
+			$result = true;
 		}
 
 		if ( $switched ) {
