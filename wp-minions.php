@@ -6,6 +6,8 @@
  * Author: Chris Marslender, Darshan Sawardekar, 10up
  * Author URI: http://10up.com/
  * License: GPLv2 or later
+ * Update URI: https://github.com/10up/WP-Minions
+ * 
  */
 
 require_once __DIR__ . '/autoload.php';
