@@ -167,10 +167,12 @@ $gearman_servers = array(
 # RabbitMQ config
 global $rabbitmq_server;
 $rabbitmq_server = array(
-  'host'     => '127.0.0.1',
-  'port'     => 5672,
-  'username' => 'guest',
-  'password' => 'guest',
+  'host'                   => 'localhost',
+  'port'                   => 5672,
+  'username'               => 'guest',
+  'password'               => 'guest',
+  'vhost'                  => '/',
+  'shutdown_hook_priority' => 10,
 );
 
 Note: On RabbitMQ the guest/guest account is the default administrator account, RabbitMQ will only allow connections connections on that account from localhost. Connections to any non-loopback address will be denied. See the RabbitMQ manual on [user management](https://www.rabbitmq.com/rabbitmqctl.8.html#User_Management) and [Access Control](https://www.rabbitmq.com/rabbitmqctl.8.html#Access_Control) for information on adding users and allowing them access to RabbitMQ resources.
